@@ -4,9 +4,8 @@
   --bg: #1a1a1a;
   --text: #ffffff;
   --muted: #8a8a8a;
-  --accent: #7fb3ff;      /* bright blue — masthead, hover */
-  --accent-dim: #8ab4e8;  /* muted blue — section labels */
-  --rule: #2b3642;        /* blue-tinted hairline */
+  --blue: #7fb3ff;        /* interactive: hover, focus, loader */
+  --rule: #333333;        /* neutral hairline */
   --skeleton: #4e4e4e;    /* placeholder text, clearly not real content */
   --up: #7fc9a0;          /* positive change */
   --down: #e0796b;        /* negative change */
@@ -14,10 +13,10 @@
   --mono: 'DejaVu Sans Mono', 'Liberation Mono', ui-monospace, monospace;
 
   /* one hue per section — used on that page's title and its tags */
-  --politics: #d98c7a;
-  --economics: #7fc9a0;
-  --tech: #b79ce8;
-  --bitcoin: #e0bf7a;
+  --clay: #d98c7a;
+  --green: #7fc9a0;
+  --violet: #b79ce8;
+  --gold: #e0bf7a;
 }
 
 body {
@@ -39,7 +38,7 @@ h1 {
   font-weight: normal;
   letter-spacing: 0.01em;
   margin: 0 0 2px 0;
-  color: var(--accent);
+  color: var(--blue);
 }
 
 
@@ -48,7 +47,7 @@ h2 {
   font-weight: normal;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--accent-dim);
+  color: var(--muted);
   margin: 34px 0 8px 0;
   padding-bottom: 5px;
   border-bottom: 1px solid var(--rule);
@@ -112,7 +111,7 @@ hr {
 }
 
 .refresh:hover {
-  color: var(--accent);
+  color: var(--blue);
 }
 
 .refresh:hover svg {
@@ -120,7 +119,7 @@ hr {
 }
 
 .refresh:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 1px solid var(--blue);
   outline-offset: 3px;
 }
 
@@ -154,11 +153,11 @@ hr {
    the rest beat. Block boundaries: 25% / 50% / 75%. */
 
 @keyframes refresh-cycle {
-  0%,   15.5% { color: var(--accent); }
-  25%,  40.5% { color: var(--politics); }
-  50%,  65.5% { color: var(--economics); }
-  75%,  90.5% { color: var(--tech); }
-  100%        { color: var(--accent); }
+  0%,   15.5% { color: var(--blue); }
+  25%,  40.5% { color: var(--clay); }
+  50%,  65.5% { color: var(--green); }
+  75%,  90.5% { color: var(--violet); }
+  100%        { color: var(--blue); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -255,7 +254,7 @@ hr {
   cursor: default;
 }
 
-/* section tags */
+/* section tags — used on the combined news feed */
 
 .tag {
   font-size: 12px;
@@ -264,25 +263,21 @@ hr {
   letter-spacing: 0.1em;
 }
 
-.tag-politics,
-h1.politics {
-  color: var(--politics);
-}
+.tag-politics  { color: var(--clay); }
+.tag-economics { color: var(--green); }
+.tag-tech      { color: var(--violet); }
 
-.tag-economics,
-h1.economics {
-  color: var(--economics);
-}
+/* Page accent. One hue per page, carried by the h1 and nothing else, so any
+   single page reads as white-on-grey with one colour — while moving between
+   sections still feels like moving somewhere. Assigned by domain rather than
+   per page, which keeps the palette at five:
+   blue = markets, green = the economy, clay = physical materials,
+   violet = technology, gold = hard money. */
 
-.tag-tech,
-h1.tech {
-  color: var(--tech);
-}
-
-.tag-bitcoin,
-h1.bitcoin {
-  color: var(--bitcoin);
-}
+h1.clay   { color: var(--clay); }
+h1.green  { color: var(--green); }
+h1.violet { color: var(--violet); }
+h1.gold   { color: var(--gold); }
 
 /* three-dot loader — shown while a summary is being generated */
 
@@ -303,7 +298,7 @@ h1.bitcoin {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--blue);
   animation: dot-pulse 1.2s infinite ease-in-out,
              dot-cycle 4.8s infinite steps(1, end);
 }
@@ -317,10 +312,10 @@ h1.bitcoin {
 }
 
 @keyframes dot-cycle {
-  0%   { background: var(--accent); }
-  25%  { background: var(--politics); }
-  50%  { background: var(--economics); }
-  75%  { background: var(--tech); }
+  0%   { background: var(--blue); }
+  25%  { background: var(--clay); }
+  50%  { background: var(--green); }
+  75%  { background: var(--violet); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -494,7 +489,7 @@ h1.bitcoin {
 }
 
 .arrow {
-  color: var(--accent-dim);
+  color: var(--muted);
 }
 
 .node-untracked {
