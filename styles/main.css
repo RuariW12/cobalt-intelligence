@@ -1,0 +1,54 @@
+/* cobalt — base theme */
+
+body {
+  background: #1a1a1a;
+  color: #ffffff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  padding: 40px;
+  max-width: 700px;
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: normal;
+  margin: 0 0 4px 0;
+}
+
+h2 {
+  font-size: 15px;
+  font-weight: normal;
+  color: #9a9a9a;
+  margin: 28px 0 6px 0;
+}
+:where
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin: 2px 0;
+}
+
+a {
+  color: #ffffff;
+}
+
+a:hover {
+  color: #7fb3ff;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #444;
+  margin: 20px 0;
+}
+
+.meta {
+  color: #7a7a7a;
+  font-size: 13px;
+}
