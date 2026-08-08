@@ -13,10 +13,11 @@
 
   --mono: 'DejaVu Sans Mono', 'Liberation Mono', ui-monospace, monospace;
 
-  /* one hue per news section — used on that page's title and its tags */
+  /* one hue per section — used on that page's title and its tags */
   --politics: #d98c7a;
   --economics: #7fc9a0;
   --tech: #b79ce8;
+  --bitcoin: #e0bf7a;
 }
 
 body {
@@ -276,6 +277,11 @@ h1.economics {
 .tag-tech,
 h1.tech {
   color: var(--tech);
+}
+
+.tag-bitcoin,
+h1.bitcoin {
+  color: var(--bitcoin);
 }
 
 /* three-dot loader — shown while a summary is being generated */
