@@ -1,0 +1,24 @@
+# NVIDIA GPU overlay for ollama. Requires the NVIDIA Container Toolkit on the
+# host — without it the container starts but silently runs on CPU.
+#
+#   sudo apt install nvidia-container-toolkit
+#   sudo nvidia-ctk runtime configure --runtime=docker
+#   sudo systemctl restart docker
+#
+# Then:
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml \
+#                  --profile llm up -d
+#
+# Not applicable on macOS: Docker Desktop cannot pass through Apple Silicon
+# GPUs. There, run ollama natively and point the app at it instead:
+#   OLLAMA_URL=http://host.docker.internal:11434 docker compose up -d
+
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

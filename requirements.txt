@@ -1,0 +1,10 @@
+# Web service. Pinned to minor versions; regenerate a lockfile with
+#   pip freeze > requirements.lock
+# once the first build succeeds, if you want byte-exact reproducibility.
+fastapi>=0.115,<0.200
+uvicorn[standard]>=0.30,<0.40
+httpx>=0.27,<0.30
+
+# Added when the ETL lands — deliberately absent for now, since pandas and
+# yfinance roughly triple the image size:
+#   yfinance, pandas, feedparser, lxml

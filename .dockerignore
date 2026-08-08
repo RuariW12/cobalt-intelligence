@@ -1,0 +1,12 @@
+.git
+.gitignore
+context/
+data/
+*.md
+__pycache__/
+*.pyc
+.env
+.venv/
+docker-compose*.yml
+Dockerfile
+serve.sh

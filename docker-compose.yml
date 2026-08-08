@@ -1,0 +1,92 @@
+# Cobalt. Default `docker compose up` starts the app alone — no model server,
+# no 6 GB download. The LLM services sit behind the `llm` profile so they only
+# run when you ask for them:
+#
+#   docker compose up -d                          app only
+#   docker compose --profile llm up -d            app + ollama (CPU)
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml \
+#                  --profile llm up -d            app + ollama (NVIDIA GPU)
+#
+# There is deliberately no database service: SQLite is a file, not a server.
+# It lives in the cobalt-data volume, shared by the web and etl containers.
+
+name: cobalt
+
+services:
+  web:
+    build:
+      context: .
+      # This host's BuildKit bridge has no DNS, so pip cannot reach PyPI during
+      # a build. Building on the host network fixes it. Harmless elsewhere;
+      # drop these two lines if your daemon resolves fine on the default bridge.
+      network: host
+    image: cobalt:latest
+    ports:
+      - "${COBALT_PORT:-8080}:8000"
+    volumes:
+      - cobalt-data:/data
+      # Edit pages without rebuilding. Drop this line for a sealed deployment.
+      - ./web:/app/web:ro
+    environment:
+      COBALT_DB: /data/cobalt.db
+      # Reachable whether ollama runs here, on the host, or on another box.
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:9b}
+      FRED_API_KEY: ${FRED_API_KEY:-}
+    restart: unless-stopped
+    # No depends_on ollama: the app must start and serve pages whether or not a
+    # model server exists. Only /api/summarize needs it, and it can fail alone.
+
+  # One-shot ingest. Same image, different command:
+  #   docker compose run --rm etl --section macro
+  etl:
+    build:
+      context: .
+      network: host
+    image: cobalt:latest
+    volumes:
+      - cobalt-data:/data
+    environment:
+      COBALT_DB: /data/cobalt.db
+      FRED_API_KEY: ${FRED_API_KEY:-}
+    entrypoint: ["python", "-m", "etl.run"]
+    profiles: ["tools"]
+    restart: "no"
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-models:/root/.ollama
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    environment:
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-30m}
+      OLLAMA_FLASH_ATTENTION: "1"
+      OLLAMA_KV_CACHE_TYPE: q8_0
+    profiles: ["llm"]
+    restart: unless-stopped
+
+  # Pulls the model into the ollama-models volume, then exits. Runs once;
+  # afterwards the weights are cached and this is a no-op.
+  #   docker compose --profile llm run --rm model-init
+  model-init:
+    image: ollama/ollama:latest
+    depends_on:
+      - ollama
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/sh", "-c", "ollama pull ${OLLAMA_MODEL:-qwen3:9b}"]
+    profiles: ["llm"]
+    restart: "no"
+
+volumes:
+  # The SQLite database and the raw-response cache. Named rather than a bind
+  # mount so it works identically on Linux, macOS and Windows without host
+  # permission juggling. Back it up with:
+  #   docker run --rm -v cobalt_cobalt-data:/d -v "$PWD":/b alpine \
+  #     tar czf /b/cobalt-data.tar.gz -C /d .
+  cobalt-data:
+
+  # Model weights — several GB. Named so `docker compose down` never costs you
+  # a re-download.
+  ollama-models:

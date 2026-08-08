@@ -6,25 +6,33 @@ _Last updated: 2026-08-08_
 
 ```
 cobalt/
-  index.html          home page — the link index for everything
-  serve.sh            ./serve.sh [port] -> python3 -m http.server on 127.0.0.1:8080
-  styles/main.css     the whole theme, one file
-  scripts/main.js     placeholder behaviour for #refresh and #summarize
-  context/            this directory
-  sections/           one directory per section, one index.html per page
-    news/             + politics, economics, tech
-    macro/            + inflation, labor, growth
-    rates/            + treasuries, credit
-    indexes/          + us, international
-    commodities/      + precious, industrial, energy
-    companies/        + tech, industrial, energy, financials, consumer
-    etfs/             + broad, international, materials
-    ai-bubble/
-    bitcoin/
-    relationships/
+  Dockerfile              web service image; also runs the ETL
+  docker-compose.yml      web + etl + ollama (llm profile) + volumes
+  docker-compose.gpu.yml  NVIDIA overlay
+  .env.example            copy to .env
+  requirements.txt
+  app/main.py             FastAPI: serves web/, stubs /api/refresh + /api/summarize
+  etl/                    empty package; planned layout in its docstring
+  serve.sh                static-only fallback, no backend
+  context/                this directory
+  web/                    THE SERVED ROOT — nothing else is public
+    index.html            home page — the link index for everything
+    styles/               8 files, main.css is the manifest
+    scripts/              main.js (deferred), theme.js (sync, in <head>)
+    sections/             one directory per section, one index.html per page
+      news/               + politics, economics, tech
+      macro/              + inflation, labor, growth
+      rates/              + treasuries, credit
+      indexes/            + us, international
+      commodities/        single page: precious / industrial / energy groups
+      companies/          + tech, industrial, energy, financials, consumer
+      etfs/               + broad, international, materials
+      ai-bubble/
+      bitcoin/
+      relationships/
 ```
 
-32 pages. Directory-per-route, so the static file server resolves
+29 pages. Directory-per-route, so the static file server resolves
 `/sections/macro/inflation` with no backend and no routing table.
 
 ## Conventions in the markup
