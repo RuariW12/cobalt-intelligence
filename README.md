@@ -186,6 +186,21 @@ context/           design notes: the spec, sources, decisions and their reasonin
 .dockerignore      stays at the root: it must sit at the build context root
 ```
 
+### Editing the Python
+
+The app only ever runs in Docker, so nothing needs installing to use it. But an
+editor cannot resolve `fastapi` without a local interpreter that has it, which
+shows up as a false "import could not be resolved" warning.
+
+```sh
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.lock
+```
+
+Installing from the lock rather than `requirements.txt` means the editor checks
+against exactly the versions the container runs. `.vscode/settings.json` already
+points at `.venv`; other editors need the interpreter set once.
+
 ### Reproducibility
 
 - `requirements.lock` pins every package, including transitive dependencies.

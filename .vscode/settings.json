@@ -1,0 +1,12 @@
+{
+  // The app runs in Docker; this venv exists only so the editor can resolve
+  // imports and offer completion. It is installed from requirements.lock, so
+  // it holds exactly the versions the container runs.
+  //   python3 -m venv .venv && .venv/bin/pip install -r requirements.lock
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.analysis.extraPaths": ["${workspaceFolder}"],
+  "python.analysis.autoImportCompletions": true,
+  "files.exclude": {
+    "**/__pycache__": true
+  }
+}
