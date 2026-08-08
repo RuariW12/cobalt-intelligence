@@ -14,12 +14,7 @@ name: cobalt
 
 services:
   web:
-    build:
-      context: .
-      # This host's BuildKit bridge has no DNS, so pip cannot reach PyPI during
-      # a build. Building on the host network fixes it. Harmless elsewhere;
-      # drop these two lines if your daemon resolves fine on the default bridge.
-      network: host
+    build: .
     image: cobalt:latest
     ports:
       - "${COBALT_PORT:-8080}:8000"
@@ -29,6 +24,7 @@ services:
       - ./web:/app/web:ro
     environment:
       COBALT_DB: /data/cobalt.db
+      TZ: ${TZ:-UTC}
       # Reachable whether ollama runs here, on the host, or on another box.
       OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:9b}
@@ -40,14 +36,13 @@ services:
   # One-shot ingest. Same image, different command:
   #   docker compose run --rm etl --section macro
   etl:
-    build:
-      context: .
-      network: host
+    build: .
     image: cobalt:latest
     volumes:
       - cobalt-data:/data
     environment:
       COBALT_DB: /data/cobalt.db
+      TZ: ${TZ:-UTC}
       FRED_API_KEY: ${FRED_API_KEY:-}
     entrypoint: ["python", "-m", "etl.run"]
     profiles: ["tools"]
@@ -75,7 +70,18 @@ services:
       - ollama
     environment:
       OLLAMA_HOST: http://ollama:11434
-    entrypoint: ["/bin/sh", "-c", "ollama pull ${OLLAMA_MODEL:-qwen3:9b}"]
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:9b}
+    # depends_on only waits for the container, not for the server to listen,
+    # so poll before pulling rather than racing it.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        for i in $$(seq 1 60); do
+          ollama list >/dev/null 2>&1 && break
+          echo "waiting for ollama ($$i/60)"; sleep 2
+        done
+        ollama pull "$${OLLAMA_MODEL:-qwen3:9b}"
     profiles: ["llm"]
     restart: "no"
 

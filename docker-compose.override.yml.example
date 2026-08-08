@@ -1,0 +1,25 @@
+# EXAMPLE — copy to docker-compose.override.yml (gitignored, auto-merged).
+#
+# This machine's BuildKit has no DNS on its default bridge, so pip cannot reach
+# PyPI during a build. Building on the host network works around it.
+#
+# Reproduce the underlying fault with:
+#   printf 'FROM alpine\nRUN getent hosts pypi.org\n' > /tmp/d/Dockerfile
+#   docker build --no-cache /tmp/d                 # fails
+#   docker build --no-cache --network=host /tmp/d  # works
+#
+# Kept out of docker-compose.yml so anyone cloning the repo gets a portable
+# build. `network: host` is Linux-only and would break on Docker Desktop.
+#
+# The real fix is daemon-side — set a resolvable DNS server in
+# /etc/docker/daemon.json, e.g. {"dns": ["1.1.1.1"]}, then restart docker.
+
+services:
+  web:
+    build:
+      context: .
+      network: host
+  etl:
+    build:
+      context: .
+      network: host
