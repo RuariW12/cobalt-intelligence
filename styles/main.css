@@ -8,6 +8,10 @@
   --accent-dim: #8ab4e8;  /* muted blue — section labels */
   --rule: #2b3642;        /* blue-tinted hairline */
   --skeleton: #4e4e4e;    /* placeholder text, clearly not real content */
+  --up: #7fc9a0;          /* positive change */
+  --down: #e0796b;        /* negative change */
+
+  --mono: 'DejaVu Sans Mono', 'Liberation Mono', ui-monospace, monospace;
 
   /* one hue per news section — used on that page's title and its tags */
   --politics: #d98c7a;
@@ -324,4 +328,59 @@ h1.tech {
   color: var(--muted);
   border-color: var(--rule);
   cursor: default;
+}
+
+/* metric rows — name on the left, figures right-aligned in tabular mono so
+   decimal points line up down the column regardless of digit width */
+
+.metrics {
+  margin: 4px 0 0 0;
+}
+
+.metric {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 18px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+  margin: 0;
+}
+
+.metric-value,
+.metric-change {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.metric-value {
+  min-width: 6em;
+}
+
+.metric-change {
+  min-width: 5em;
+}
+
+.up   { color: var(--up); }
+.down { color: var(--down); }
+
+.metric-period {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.placeholder .metric-name,
+.placeholder .metric-value,
+.placeholder .metric-change {
+  color: var(--skeleton);
+}
+
+.source-note {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 14px;
 }
