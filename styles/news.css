@@ -1,0 +1,50 @@
+/* headline list — the news section, and the "related headlines" block that
+   sits at the foot of most data pages */
+
+.stories {
+  margin: 4px 0 0 0;
+}
+
+.story {
+  margin: 0 0 18px 0;
+}
+
+.headline {
+  display: block;
+}
+
+.byline {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.byline a {
+  color: var(--muted);
+}
+
+/* skeleton rows — dimmed so an empty page never reads as real content.
+   Dropping .placeholder is what makes a row look live. */
+
+.placeholder .headline {
+  color: var(--skeleton);
+}
+
+.placeholder .headline:hover {
+  text-decoration: none;
+  cursor: default;
+}
+
+/* section tags — used on the combined news feed */
+
+.tag {
+  font-size: 12px;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.tag-politics  { color: var(--clay); }
+.tag-economics { color: var(--green); }
+.tag-tech      { color: var(--violet); }

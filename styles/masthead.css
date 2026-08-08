@@ -1,0 +1,80 @@
+/* masthead — tagline plus the refresh control, sat on one line */
+
+.masthead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.refresh {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+}
+
+.refresh svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.4s ease, color 0.15s ease;
+}
+
+.refresh:hover {
+  color: var(--blue);
+}
+
+.refresh:hover svg {
+  transform: rotate(180deg);
+}
+
+.refresh:focus-visible {
+  outline: 1px solid var(--blue);
+  outline-offset: 3px;
+}
+
+/* Refresh in progress. One turn, then a half-second rest, forever — the rest
+   is a hold at 360deg inside the keyframes rather than a separate delay, so
+   the cycle never drifts. The two animations are phase-locked: 5.2s is exactly
+   four 1.3s turns, and the colour holds steady for the whole of each turn,
+   then blends to the next hue during the rest beat while the icon is still.
+   So motion and colour change never happen at the same moment.
+   Dropping .spinning returns it to the resting grey. */
+
+.refresh.spinning svg {
+  animation: refresh-spin 1.3s infinite,
+             refresh-cycle 5.2s infinite ease-in-out;
+}
+
+/* Per-keyframe timing: the turn accelerates and settles on its own curve,
+   independent of the flat hold that follows it. */
+
+@keyframes refresh-spin {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  62%, 100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Each hue holds through its turn (to 62% of the block), then blends across
+   the rest beat. Block boundaries: 25% / 50% / 75%. */
+
+@keyframes refresh-cycle {
+  0%,   15.5% { color: var(--blue); }
+  25%,  40.5% { color: var(--clay); }
+  50%,  65.5% { color: var(--green); }
+  75%,  90.5% { color: var(--violet); }
+  100%        { color: var(--blue); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes refresh-spin {
+    0%, 100% { transform: none; }
+  }
+}

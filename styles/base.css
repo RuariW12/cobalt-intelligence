@@ -1,0 +1,101 @@
+/* base — page frame, typography and the elements every page uses */
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Charter, 'Bitstream Charter', 'Iowan Old Style', Georgia,
+               'Noto Serif', serif;
+  font-size: 19px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 48px 40px;
+  max-width: 780px;
+}
+
+h1 {
+  font-size: 34px;
+  font-weight: normal;
+  letter-spacing: 0.01em;
+  margin: 0 0 2px 0;
+  color: var(--blue);
+}
+
+/* Section labels, not headlines. Small and grey on purpose: a page with nine
+   of them should read as nine dividers, not nine competing titles. */
+
+h2 {
+  font-size: 13px;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  margin: 34px 0 8px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--rule);
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin: 3px 0;
+}
+
+a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 24px 0;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 15px;
+  font-style: italic;
+}
+
+/* trailing note under a table or list — source, caveat, empty state */
+
+.source-note {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+  margin-top: 14px;
+}
+
+/* breadcrumb — every page but the home page */
+
+.crumb {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+  margin: 0 0 16px 0;
+}
+
+.crumb a {
+  color: var(--muted);
+}
+
+/* Page accent. One hue per page, carried by the h1 and nothing else, so any
+   single page reads as white-on-grey with one colour — while moving between
+   sections still feels like moving somewhere. Assigned by domain rather than
+   per page, which keeps the palette at five:
+   blue = markets, green = the economy, clay = physical materials,
+   violet = technology, gold = hard money. */
+
+h1.clay   { color: var(--clay); }
+h1.green  { color: var(--green); }
+h1.violet { color: var(--violet); }
+h1.gold   { color: var(--gold); }

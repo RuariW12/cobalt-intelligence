@@ -1,0 +1,21 @@
+/* tokens — every colour and face in the app. Nothing else defines a literal
+   colour value; if you want to retune the theme, this is the only file. */
+
+:root {
+  --bg: #1a1a1a;
+  --text: #ffffff;
+  --muted: #8a8a8a;
+  --blue: #7fb3ff;        /* interactive: hover, focus, loader */
+  --rule: #333333;        /* neutral hairline */
+  --skeleton: #4e4e4e;    /* placeholder text, clearly not real content */
+  --up: #7fc9a0;          /* positive change */
+  --down: #e0796b;        /* negative change */
+
+  --mono: 'DejaVu Sans Mono', 'Liberation Mono', ui-monospace, monospace;
+
+  /* one hue per section — used on that page's title and its tags */
+  --clay: #d98c7a;
+  --green: #7fc9a0;
+  --violet: #b79ce8;
+  --gold: #e0bf7a;
+}

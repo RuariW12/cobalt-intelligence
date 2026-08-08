@@ -1,0 +1,92 @@
+/* llm summary panel — the ask-the-model block at the top of every page */
+
+.summary {
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--text);
+  padding: 14px 18px 16px;
+  margin: 22px 0 30px;
+}
+
+/* the panel's label is white, not a grey divider like other h2s */
+
+.summary h2 {
+  margin-top: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+  color: var(--text);
+}
+
+.summary-body {
+  margin: 0 0 14px 0;
+}
+
+.ask {
+  font: inherit;
+  font-size: 15px;
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--text);
+  padding: 5px 13px;
+  cursor: pointer;
+}
+
+.ask:hover {
+  border-color: var(--text);
+}
+
+.ask:focus-visible {
+  outline: 1px solid var(--text);
+  outline-offset: 2px;
+}
+
+.ask:disabled {
+  color: var(--muted);
+  border-color: var(--rule);
+  cursor: default;
+}
+
+/* three-dot loader — replaces the summary body while one is generating */
+
+.dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 1.55em;
+}
+
+/* Two animations per dot, deliberately out of step with each other:
+   dot-pulse runs one rise-and-fall (1.2s), dot-cycle steps through the four
+   palette hues over exactly four of those rises (4.8s). Because the colour
+   swap lands on the trough — where opacity is already 0 — the dot is invisible
+   at the moment it changes, so each rise brings up a new colour cleanly. */
+
+.dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: dot-pulse 1.2s infinite ease-in-out,
+             dot-cycle 4.8s infinite steps(1, end);
+}
+
+.dots span:nth-child(2) { animation-delay: 0.15s; }
+.dots span:nth-child(3) { animation-delay: 0.30s; }
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0; transform: translateY(0); }
+  50%      { opacity: 1; transform: translateY(-6px); }
+}
+
+@keyframes dot-cycle {
+  0%   { background: var(--blue); }
+  25%  { background: var(--clay); }
+  50%  { background: var(--green); }
+  75%  { background: var(--violet); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes dot-pulse {
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 1; }
+  }
+}

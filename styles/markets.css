@@ -1,0 +1,139 @@
+/* Numeric display, shared by macro, rates, indexes, commodities, companies,
+   etfs and the trackers. Two components:
+     .metric  — one figure plus a change, as a list row
+     .quotes  — several numeric columns, as a real table with headers
+   Reach for the table once a row carries more than two numbers; past that a
+   list gives the reader nothing to tell the columns apart. */
+
+/* metric rows — name on the left, figures right-aligned in tabular mono so
+   decimal points line up down the column regardless of digit width */
+
+.metrics {
+  margin: 4px 0 0 0;
+}
+
+.metric {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 18px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+  margin: 0;
+}
+
+.metric-value,
+.metric-change {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.metric-value {
+  min-width: 6em;
+}
+
+.metric-change {
+  min-width: 5em;
+}
+
+.metric-period {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.placeholder .metric-name,
+.placeholder .metric-value,
+.placeholder .metric-change {
+  color: var(--skeleton);
+}
+
+/* direction of a change — the only place these two colours are used */
+
+.up   { color: var(--up); }
+.down { color: var(--down); }
+
+/* quote table — for price rows carrying several numeric columns, which need
+   real column headers to stay readable */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.quotes {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4px;
+}
+
+.quotes th {
+  font-size: 12px;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-align: right;
+  padding: 0 0 7px 18px;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.quotes td {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  padding: 9px 0 9px 18px;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+/* first column is a name, not a number — left aligned, body face */
+
+.quotes th:first-child,
+.quotes td:first-child {
+  text-align: left;
+  padding-left: 0;
+  font-family: inherit;
+  font-size: inherit;
+  white-space: normal;
+}
+
+.quotes tr.placeholder td {
+  color: var(--skeleton);
+}
+
+/* qualifiers sat next to a row name — region, unit of measure */
+
+.region,
+.unit {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* ticker symbols — mono so they read as identifiers, not prose */
+
+.ticker {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* session dot — international markets are rarely all open at once, so each
+   row states whether its quote is live or a close */
+
+.session {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 7px;
+  vertical-align: middle;
+  background: var(--skeleton);
+}
+
+.session.open   { background: var(--up); }
+.session.closed { background: var(--muted); }

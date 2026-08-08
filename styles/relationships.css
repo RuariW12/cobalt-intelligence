@@ -1,0 +1,34 @@
+/* relationship chains — each node links to the page tracking it, so a chain
+   doubles as a route through the app. Nodes with no page stay plain text. */
+
+.chain {
+  margin: 0 0 20px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.chain:last-of-type {
+  border-bottom: none;
+}
+
+.chain-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 9px;
+}
+
+.arrow {
+  color: var(--muted);
+}
+
+.node-untracked {
+  color: var(--muted);
+}
+
+.chain-note {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+  margin: 5px 0 0 0;
+}
