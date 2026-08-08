@@ -1,0 +1,35 @@
+# Host-networking overlay. Use when a VPN kill switch blocks Docker's bridge
+# network — Mullvad, ProtonVPN and similar drop non-tunnel traffic by default,
+# which kills connections to published container ports even though
+# docker-proxy is listening.
+#
+# This bypasses the bridge entirely: uvicorn binds the host's loopback direct.
+#
+#   ./start.sh --host-net
+#
+# Linux only. The cleaner fix is to allow local network sharing in the VPN
+# client, which keeps the portable bridge setup working:
+#   mullvad lan set allow
+
+services:
+  web:
+    network_mode: host
+    ports: !reset []
+    environment:
+      COBALT_PORT: ${COBALT_PORT:-5173}
+    # Loopback, not 0.0.0.0 — in host mode 0.0.0.0 would expose the app to the
+    # whole LAN rather than just this machine.
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 127.0.0.1
+      - --port
+      - ${COBALT_PORT:-5173}
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import os,sys,urllib.request; p=os.environ.get('COBALT_PORT','5173'); sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:'+p+'/api/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 3s
+      start_period: 20s
+      retries: 3

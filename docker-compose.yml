@@ -17,7 +17,7 @@ services:
     build: .
     image: cobalt:latest
     ports:
-      - "${COBALT_PORT:-8080}:8000"
+      - "${COBALT_PORT:-5173}:8000"
     volumes:
       - cobalt-data:/data
       # Edit pages without rebuilding. Drop this line for a sealed deployment.

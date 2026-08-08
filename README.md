@@ -19,18 +19,18 @@ cp .env.example .env      # optional for now; needed once the ETL lands
 docker compose up -d
 ```
 
-Open <http://localhost:8080>.
+Open <http://localhost:5173>.
 
 To stop: `docker compose down`. Your data lives in a named volume and survives.
 
-If port 8080 is taken, set `COBALT_PORT=8081` in `.env`.
+If port 5173 is taken, set `COBALT_PORT=5174` in `.env`.
 
 ### Without Docker
 
 The pages are static, so you can browse them with no backend at all:
 
 ```sh
-./serve.sh          # http://localhost:8080
+./serve.sh          # http://localhost:5173
 ```
 
 The refresh and summarize buttons need the app; everything else works.
@@ -205,7 +205,7 @@ Linux-only workaround, copy `docker-compose.override.yml.example` to
 `docker-compose.override.yml` — Compose merges it automatically.
 
 **Port already in use.** Set `COBALT_PORT` in `.env`, or find the holder with
-`ss -ltnp | grep 8080`.
+`ss -ltnp | grep 5173`.
 
 **Pages 404 but `/api/health` works.** The `web/` directory didn't make it into
 the image. Rebuild with `docker compose build --no-cache web`.

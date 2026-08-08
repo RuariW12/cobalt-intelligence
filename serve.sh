@@ -3,7 +3,7 @@
 # The refresh and summarize buttons need the app: use `docker compose up`.
 set -euo pipefail
 
-PORT="${1:-8080}"
+PORT="${1:-5173}"
 cd "$(dirname "$0")/web"
 
 echo "cobalt (static only) -> http://localhost:${PORT}"
