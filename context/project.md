@@ -8,7 +8,10 @@ localhost, no deployment target.
 1. User runs a script in the terminal to launch the local server.
 2. User opens it in a browser; the site shows the **last refreshed** data.
 3. A **refresh button** in the site triggers a scraper / cleaning job that
-   ingests new data from the selected APIs.
+   ingests new data from the selected APIs. Scope depends on where it sits:
+   the one on the **home page refreshes everything**; the one on any **section
+   page refreshes only that page**. The ETL therefore needs per-source jobs
+   that can be run individually or as a full sweep.
 4. When the job completes, the site refreshes and shows current-day data.
 
 Data comes from free, publicly available APIs (Yahoo Finance and similar).
