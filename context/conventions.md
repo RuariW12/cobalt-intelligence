@@ -20,5 +20,15 @@ Deliberately plain — close to raw HTML.
 
 ## Markup
 
+- **No hand-written page HTML.** Pages come from `app/catalog.py` rendered
+  through `app/templates/page.html`. To add a page, add an entry to the
+  catalog; to change a component's markup, edit the template once.
+- A page is an ordered list of panels. Panel types: `links`, `metrics`,
+  `quotes`, `stories`, `chains`, `note`.
+- Every data row carries the identifier that fills it — `series` (FRED),
+  `symbol` (Yahoo), `derived` (computed here), `manual` (hand-entered). The
+  ETL reads the same catalog, so a page and its ingest cannot drift apart.
+- Prose in the catalog is trusted HTML and rendered with `|safe`. It is
+  authored in this repo, never user input.
 - Behavior belongs in JS files, not inline handlers. Give elements an `id` and
-  wire them up externally (e.g. the home page's `#refresh`).
+  wire them up externally (e.g. `#refresh`).

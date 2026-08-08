@@ -1,14 +1,20 @@
+{#- Every page's chrome. Previously copy-pasted into 29 files; the refresh SVG
+    alone was 6 lines repeated 28 times. Prose in the catalog is trusted and
+    authored here, so it renders unescaped via |safe. -#}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>interest rates &amp; credit &middot; cobalt</title>
+<title>{{ page.title|safe }}{% if page.section != 'home' %} &middot; cobalt{% endif %}</title>
 <link rel="stylesheet" href="/styles/main.css">
+{%- if page.section == 'home' %}
+<link rel="stylesheet" href="/styles/home.css">
+{%- endif %}
 <script src="/scripts/theme.js"></script>
 <script src="/scripts/main.js" defer></script>
 </head>
-<body data-section="rates">
+<body data-section="{{ page.section }}">
 
 <button type="button" class="theme-toggle" id="theme-toggle" title="Switch to day mode" aria-label="Switch to day mode">
   <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -29,35 +35,39 @@
   </svg>
 </button>
 
-<div class="crumb"><a href="/">cobalt</a> / interest rates &amp; credit</div>
+{%- if page.crumb %}
+<div class="crumb">
+  {%- for c in page.crumb %}{% if c.href %}<a href="{{ c.href }}">{{ c.label|safe }}</a>{% else %}{{ c.label|safe }}{% endif %}{% if not loop.last %} / {% endif %}{% endfor -%}
+</div>
+{%- endif %}
 
-<h1 class="green">Interest Rates &amp; Credit</h1>
+<h1{% if page.accent %} class="{{ page.accent }}"{% endif %}>{{ page.h1|safe }}</h1>
 <div class="masthead">
-  <span class="meta">monetary policy and the cost of capital &mdash; last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
-  <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
+  <span class="meta">{{ page.tagline|safe }}
+    {%- if page.show_refreshed %}{% if page.tagline %} &mdash; {% endif %}last refreshed:
+    <span class="refreshed" data-refreshed="">never</span>{% endif %}</span>
+  {%- if page.refresh %}
+  <button type="button" id="refresh" class="refresh" title="{{ page.refresh_label }}" aria-label="{{ page.refresh_label }}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <polyline points="23 4 23 10 17 10"></polyline>
       <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
     </svg>
   </button>
+  {%- endif %}
 </div>
 
 <hr>
 
+{%- if page.summarize %}
+
 <section class="summary">
   <h2>daily summary</h2>
-  <p class="summary-body meta">No summary yet. Refresh the data, then ask for one.</p>
+  <p class="summary-body meta">{{ page.summary_body|safe }}</p>
   <button type="button" class="ask" id="summarize">summarize</button>
 </section>
-
-<h2>sections</h2>
-<ul>
-  <li><a href="/sections/rates/treasuries">policy &amp; treasuries</a> <span class="meta">fed funds, 2y, 10y, 30y, curve</span></li>
-  <li><a href="/sections/rates/credit">credit spreads</a> <span class="meta">investment grade, high yield</span></li>
-</ul>
-
-<p class="source-note">This page is an index. Figures live on the pages above; refreshing here refreshes all of them.</p>
+{%- endif %}
+{% block content %}{% endblock %}
 
 </body>
 </html>

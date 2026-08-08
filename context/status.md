@@ -10,35 +10,30 @@ See README.md for how to run it. Layout:
 cobalt/
   start.sh stop.sh        the supported entrypoints
   docker/                 Dockerfile, compose.yml, compose.gpu.yml, compose.vpn.yml
-  app/main.py             FastAPI: serves web/, stubs /api/refresh + /api/summarize
+  app/main.py             FastAPI: routes, stubs /api/refresh + /api/summarize
+  app/catalog.py          THE source of truth: every page, panel and row
+  app/templates/          base.html + page.html — all 29 pages render from these
   etl/                    stub package; planned layout in its docstring
   requirements.txt        direct deps; requirements.lock pins everything
   context/                this directory
-  web/                    THE SERVED ROOT — nothing else is public
-    index.html            home page — the link index for everything
+  web/                    static assets only — the pages are rendered, not files
     styles/               8 files, main.css is the manifest
     scripts/              main.js (deferred), theme.js (sync, in <head>)
-    sections/             one directory per section, one index.html per page
-      news/               + politics, economics, tech
-      macro/              + inflation, labor, growth
-      rates/              + treasuries, credit
-      indexes/            + us, international
-      commodities/        single page: precious / industrial / energy groups
-      companies/          + tech, industrial, energy, financials, consumer
-      etfs/               + broad, international, materials
-      ai-bubble/
-      bitcoin/
-      relationships/
 ```
 
-29 pages. Directory-per-route, so the static file server resolves
-`/sections/macro/inflation` with no backend and no routing table.
+29 pages, all from the catalog: home; news (+politics, economics, tech); macro
+(+inflation, labor, growth); rates (+treasuries, credit); indexes (+us,
+international); commodities; companies (+tech, industrial, energy, financials,
+consumer); etfs (+broad, international, materials); ai-bubble; bitcoin;
+relationships.
+
+URLs are unchanged from the static version, and both `/sections/macro` and
+`/sections/macro/` resolve without a redirect.
 
 ## Conventions in the markup
 
-- Every page: breadcrumb, `h1`, masthead with refresh icon, `hr`, summary panel,
-  then content. Only `/sections/relationships` omits the refresh (it ingests
-  nothing of its own).
+- Chrome (crumb, h1, masthead, summary panel) lives in `base.html` only.
+  Only `/sections/relationships` omits the refresh — it ingests nothing.
 - Content components: `.metric` rows (one figure + change), `.quotes` tables
   (several numeric columns), `.stories` (headlines), `.chain` (relationships).
 - Skeleton rows carry `.placeholder`, which dims them to `--skeleton`. Removing

@@ -1,0 +1,92 @@
+{#- Generic page renderer. Every page is an ordered list of panels, so there is
+    one template rather than 29. -#}
+{% extends "base.html" %}
+{% block content %}
+{%- for p in page.panels %}
+{% if p.heading %}
+<h2>{{ p.heading|safe }}</h2>
+{%- endif %}
+{%- if p.type == 'links' %}
+<ul>
+  {%- for i in p['items'] %}
+  {%- if i.href %}
+  <li><a href="{{ i.href }}">{{ i.label|safe }}</a>{% if i.meta %} <span class="meta">{{ i.meta|safe }}</span>{% endif %}</li>
+  {%- else %}
+  <li class="meta">{{ i.text|safe }}</li>
+  {%- endif %}
+  {%- endfor %}
+</ul>
+{%- elif p.type == 'metrics' %}
+<ul class="metrics">
+  {%- for r in p.rows %}
+  <li class="metric placeholder"
+      {%- if r.series %} data-series="{{ r.series }}"{% endif %}
+      {%- if r.derived %} data-derived="{{ r.derived }}"{% endif %}
+      {%- if r.manual %} data-manual="{{ r.manual }}"{% endif %}
+      {%- if r.source %} data-source="{{ r.source }}"{% endif %}>
+    <span class="metric-name">{{ r.name|safe }}{% if r.period %} <span class="metric-period">{{ r.period|safe }}</span>{% endif %}</span>
+    <span class="metric-value">&mdash;</span>
+    <span class="metric-change">&mdash;</span>
+  </li>
+  {%- endfor %}
+</ul>
+{%- elif p.type == 'quotes' %}
+<div class="table-wrap">
+<table class="quotes"{% if p.source %} data-source="{{ p.source }}"{% endif %}>
+  <thead>
+    <tr>
+      {%- for c in p.columns %}
+      <th scope="col">{{ c|safe }}</th>
+      {%- endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {%- for r in p.rows %}
+    <tr class="placeholder"{% if r.symbol %} data-symbol="{{ r.symbol }}"{% endif %}>
+      <td>{% if r.session %}<span class="session"></span>{% endif %}{{ r.name|safe }}
+          {%- if r.unit %} <span class="unit">{{ r.unit|safe }}</span>{% endif %}
+          {%- if r.region %} <span class="region">{{ r.region|safe }}</span>{% endif %}</td>
+      {%- if r.ticker %}
+      <td class="ticker">{{ r.ticker }}</td>
+      {%- endif %}
+      {%- for _ in range(p.columns|length - (2 if r.ticker else 1)) %}
+      <td>&mdash;</td>
+      {%- endfor %}
+    </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+</div>
+{%- elif p.type == 'stories' %}
+<ul class="stories"{% if p.tags %} data-source="news" data-tags="{{ p.tags }}"{% endif %}>
+  {%- for s in p['items'] %}
+  <li class="story placeholder">
+    <a class="headline" href="#">Headline text appears here, linking to the source</a>
+    <div class="byline">{% if s.tag %}<span class="tag {{ s.tag_class }}">{{ s.tag|safe }}</span> &middot; {% endif %}source &middot; &mdash;</div>
+  </li>
+  {%- endfor %}
+</ul>
+{%- elif p.type == 'chains' %}
+{%- for c in p.chains %}
+<div class="chain">
+  <div class="chain-links">
+    {%- for n in c.nodes %}
+    {%- if n.sep %}
+    <span class="arrow">{{ n.sep|safe }}</span>
+    {%- elif n.href %}
+    <a href="{{ n.href }}">{{ n.label|safe }}</a>
+    {%- else %}
+    <span class="node-untracked">{{ n.label|safe }}</span>
+    {%- endif %}
+    {%- endfor %}
+  </div>
+  {%- if c.note %}
+  <p class="chain-note">{{ c.note|safe }}</p>
+  {%- endif %}
+</div>
+{%- endfor %}
+{%- elif p.type == 'note' %}
+<p class="{{ p.style if p.style else 'source-note' }}">{{ p.text|safe }}</p>
+{%- endif %}
+{%- endfor %}
+{% endblock %}
