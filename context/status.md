@@ -4,16 +4,15 @@ _Last updated: 2026-08-08_
 
 ## Exists
 
+See README.md for how to run it. Layout:
+
 ```
 cobalt/
-  Dockerfile              web service image; also runs the ETL
-  docker-compose.yml      web + etl + ollama (llm profile) + volumes
-  docker-compose.gpu.yml  NVIDIA overlay
-  .env.example            copy to .env
-  requirements.txt
+  start.sh stop.sh        the supported entrypoints
+  docker/                 Dockerfile, compose.yml, compose.gpu.yml, compose.vpn.yml
   app/main.py             FastAPI: serves web/, stubs /api/refresh + /api/summarize
-  etl/                    empty package; planned layout in its docstring
-  serve.sh                static-only fallback, no backend
+  etl/                    stub package; planned layout in its docstring
+  requirements.txt        direct deps; requirements.lock pins everything
   context/                this directory
   web/                    THE SERVED ROOT — nothing else is public
     index.html            home page — the link index for everything

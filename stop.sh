@@ -23,11 +23,8 @@ command -v docker >/dev/null || { echo "docker is not installed" >&2; exit 1; }
 docker info >/dev/null 2>&1 || { echo "docker daemon is not running" >&2; exit 1; }
 
 # Include every overlay: `down` only removes what the merged config declares,
-# so a stack started with --host-net or --gpu must be torn down the same way.
-FILES=(-f docker-compose.yml -f docker-compose.gpu.yml -f docker-compose.hostnet.yml)
-# Passing any -f flag disables Compose's automatic merge of
-# docker-compose.override.yml, so re-add it explicitly when present.
-[ -f docker-compose.override.yml ] && FILES+=(-f docker-compose.override.yml)
+# so a stack started with --vpn or --gpu must be torn down the same way.
+FILES=(-f docker/compose.yml -f docker/compose.gpu.yml -f docker/compose.vpn.yml)
 PROFILES=(--profile llm --profile tools)
 
 if [ "$WIPE" -eq 1 ]; then

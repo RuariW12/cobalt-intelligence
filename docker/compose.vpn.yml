@@ -1,18 +1,25 @@
-# Host-networking overlay. Use when a VPN kill switch blocks Docker's bridge
-# network — Mullvad, ProtonVPN and similar drop non-tunnel traffic by default,
-# which kills connections to published container ports even though
-# docker-proxy is listening.
+# VPN overlay. A kill switch that drops non-tunnel traffic (Mullvad, ProtonVPN
+# and friends) breaks Docker's bridge network in two places at once, which is
+# why both fixes live here:
 #
-# This bypasses the bridge entirely: uvicorn binds the host's loopback direct.
+#   build   - BuildKit cannot resolve DNS, so pip cannot reach PyPI
+#   runtime - connections to published ports die even though docker-proxy
+#             is listening
 #
-#   ./start.sh --host-net
+# ./start.sh applies this automatically when it detects the condition.
 #
 # Linux only. The cleaner fix is to allow local network sharing in the VPN
-# client, which keeps the portable bridge setup working:
+# client, which keeps the portable bridge setup working for everyone else:
 #   mullvad lan set allow
 
 services:
+  etl:
+    build:
+      network: host
+
   web:
+    build:
+      network: host
     network_mode: host
     ports: !reset []
     environment:

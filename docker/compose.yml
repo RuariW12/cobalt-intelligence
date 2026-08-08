@@ -1,11 +1,11 @@
-# Cobalt. Default `docker compose up` starts the app alone — no model server,
-# no 6 GB download. The LLM services sit behind the `llm` profile so they only
-# run when you ask for them:
+# Cobalt. Use ./start.sh and ./stop.sh rather than driving compose directly —
+# they pick the right overlays and detect the VPN case. Equivalent by hand:
 #
-#   docker compose up -d                          app only
-#   docker compose --profile llm up -d            app + ollama (CPU)
-#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml \
-#                  --profile llm up -d            app + ollama (NVIDIA GPU)
+#   docker compose -f docker/compose.yml up -d
+#   docker compose -f docker/compose.yml --profile llm up -d
+#
+# The app runs alone by default: the model server sits behind the `llm` profile
+# so a plain start costs no RAM and triggers no multi-GB download.
 #
 # There is deliberately no database service: SQLite is a file, not a server.
 # It lives in the cobalt-data volume, shared by the web and etl containers.
@@ -14,14 +14,16 @@ name: cobalt
 
 services:
   web:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     image: cobalt:latest
     ports:
       - "${COBALT_PORT:-5173}:8000"
     volumes:
       - cobalt-data:/data
       # Edit pages without rebuilding. Drop this line for a sealed deployment.
-      - ./web:/app/web:ro
+      - ../web:/app/web:ro
     environment:
       COBALT_DB: /data/cobalt.db
       TZ: ${TZ:-UTC}
@@ -36,7 +38,9 @@ services:
   # One-shot ingest. Same image, different command:
   #   docker compose run --rm etl --section macro
   etl:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     image: cobalt:latest
     volumes:
       - cobalt-data:/data

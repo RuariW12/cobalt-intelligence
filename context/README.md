@@ -10,7 +10,6 @@ and conventions to follow. Code explains *what*; this explains *why*.
 | `updated-context.md` | Source of truth for *what* gets tracked — every metric, ticker, and relationship chain. Written by the user. |
 | `conventions.md` | Rules for how code in this repo is written. |
 | `status.md` | What exists today and what's next. Update as work lands. |
-| `docker.md` | How the app is containerised, what is deliberately not a container, and the host quirks that bite. |
 | `etl-plan.md` | Source per tracked series, the gaps with no free source, and the deduplication decisions. |
 
 Keep entries short and factual. If something here contradicts the code, the code

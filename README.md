@@ -16,24 +16,34 @@ Requires [Docker](https://docs.docker.com/get-docker/) with Compose v2.
 git clone <your-repo-url> cobalt
 cd cobalt
 cp .env.example .env      # optional for now; needed once the ETL lands
-docker compose up -d
+./start.sh
 ```
 
-Open <http://localhost:5173>.
-
-To stop: `docker compose down`. Your data lives in a named volume and survives.
-
-If port 5173 is taken, set `COBALT_PORT=5174` in `.env`.
-
-### Without Docker
-
-The pages are static, so you can browse them with no backend at all:
+Open <http://localhost:5173>. Stop with `./stop.sh` — your data is in a named
+volume and survives.
 
 ```sh
-./serve.sh          # http://localhost:5173
+./start.sh              app only
+./start.sh --llm        + the local model server
+./start.sh --gpu --llm  + the model server on an NVIDIA GPU
+./stop.sh               stop everything, keep data
+./stop.sh --wipe        also delete the database and model weights
 ```
 
-The refresh and summarize buttons need the app; everything else works.
+If port 5173 is taken, set `COBALT_PORT` in `.env`.
+
+### Behind a VPN
+
+A kill switch that drops non-tunnel traffic (Mullvad, ProtonVPN and similar)
+breaks Docker's bridge network — builds fail to reach PyPI and published ports
+refuse connections even though the container is healthy. `./start.sh` detects
+this and switches to host networking automatically.
+
+The cleaner fix, which keeps the portable setup everyone else uses:
+
+```sh
+mullvad lan set allow
+```
 
 ---
 
@@ -60,15 +70,15 @@ Verify the exact tag exists before setting it — model names change between
 generations:
 
 ```sh
-docker compose --profile llm up -d ollama
-docker compose exec ollama ollama list
+./start.sh --llm
+docker compose -f docker/compose.yml exec ollama ollama list
 ```
 
 ### 2. Start it and pull the weights
 
 ```sh
-docker compose --profile llm up -d
-docker compose --profile llm run --rm model-init     # one-time download
+./start.sh --llm
+docker compose -f docker/compose.yml --profile llm run --rm model-init  # one-time
 ```
 
 The weights land in the `ollama-models` volume, so `docker compose down` never
@@ -112,13 +122,13 @@ Your GPU should be listed. If this fails, nothing below will work.
 ### 3. Start with the GPU overlay
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.gpu.yml --profile llm up -d
+./start.sh --gpu --llm
 ```
 
 ### 4. Confirm the model is actually on the GPU
 
 ```sh
-docker compose exec ollama ollama ps
+docker compose -f docker/compose.yml exec ollama ollama ps
 ```
 
 The `PROCESSOR` column should read `100% GPU`. Anything mentioning CPU means
@@ -140,8 +150,8 @@ OLLAMA_URL=http://172.17.0.1:11434               # Linux, host-native ollama
 ## Ingesting data
 
 ```sh
-docker compose run --rm etl --section macro     # one section
-docker compose run --rm etl --section all       # everything
+docker compose -f docker/compose.yml run --rm etl --section macro
+docker compose -f docker/compose.yml run --rm etl --section all
 ```
 
 Most series come from [FRED](https://fredaccount.stlouisfed.org), which needs a
@@ -167,10 +177,13 @@ the `cobalt-data` volume that `web` and `etl` share. If this ever needs
 concurrent writers or network access, that is when Postgres becomes a container.
 
 ```
-app/        FastAPI service
-etl/        ingest pipeline (stub)
-web/        the served root — nothing outside this directory is public
-context/    design notes: the spec, sources, decisions and their reasoning
+start.sh stop.sh   the supported way to run it
+app/               FastAPI service
+etl/               ingest pipeline (stub)
+web/               the served root — nothing outside this directory is public
+docker/            Dockerfile, compose.yml, and the gpu / vpn overlays
+context/           design notes: the spec, sources, decisions and their reasoning
+.dockerignore      stays at the root: it must sit at the build context root
 ```
 
 ### Reproducibility
@@ -179,7 +192,7 @@ context/    design notes: the spec, sources, decisions and their reasoning
   Rebuilding on another machine or in a year resolves identically.
   Regenerate after editing `requirements.txt`:
   ```sh
-  docker compose build web
+  docker compose -f docker/compose.yml build web
   docker run --rm cobalt:latest pip freeze > requirements.lock
   ```
 - The base image `python:3.12-slim` and `ollama/ollama` are both multi-arch, so
@@ -198,14 +211,13 @@ docker run --rm -v cobalt_cobalt-data:/d -v "$PWD":/b alpine \
 
 ## Troubleshooting
 
-**`pip` fails during build with a DNS error.** Your Docker daemon has no
-working DNS on its build network. Fix it daemon-side by adding
-`{"dns": ["1.1.1.1"]}` to `/etc/docker/daemon.json` and restarting Docker. As a
-Linux-only workaround, copy `docker-compose.override.yml.example` to
-`docker-compose.override.yml` — Compose merges it automatically.
+**`pip` fails during build with a DNS error.** Usually a VPN kill switch (see
+*Behind a VPN* above) — `./start.sh` handles it. Otherwise your daemon has no
+working DNS: add `{"dns": ["1.1.1.1"]}` to `/etc/docker/daemon.json` and
+restart Docker.
 
 **Port already in use.** Set `COBALT_PORT` in `.env`, or find the holder with
-`ss -ltnp | grep 5173`.
+`ss -ltnp | grep 5173`. `./start.sh` names the holder for you.
 
 **Pages 404 but `/api/health` works.** The `web/` directory didn't make it into
 the image. Rebuild with `docker compose build --no-cache web`.

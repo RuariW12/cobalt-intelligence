@@ -18,7 +18,7 @@ WORKDIR /app
 # requirements.lock pins exact versions including transitives, so an image
 # built on another machine or in a year's time resolves identically.
 # requirements.txt stays as the human-edited source of direct dependencies.
-COPY requirements.txt requirements.lock ./
+COPY requirements.lock ./
 RUN pip install --no-cache-dir -r requirements.lock
 
 COPY app/ app/
