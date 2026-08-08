@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>market indexes &middot; cobalt</title>
+<link rel="stylesheet" href="/styles/main.css">
+<script src="/scripts/main.js" defer></script>
+</head>
+<body>
+
+<div class="crumb"><a href="/">cobalt</a> / market indexes</div>
+
+<h1>Market Indexes</h1>
+<div class="masthead">
+  <span class="meta">major equity markets &mdash; last refreshed: never</span>
+  <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="23 4 23 10 17 10"></polyline>
+      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+    </svg>
+  </button>
+</div>
+
+<hr>
+
+<section class="summary">
+  <h2>daily summary</h2>
+  <p class="summary-body meta">No summary yet. Refresh the data, then ask for one.</p>
+  <button type="button" class="ask" id="summarize">summarize</button>
+</section>
+
+<h2>sections</h2>
+<ul>
+  <li><a href="/indexes/us">united states</a> <span class="meta">s&amp;p 500, nasdaq, dow</span></li>
+  <li><a href="/indexes/international">international</a> <span class="meta">japan, korea, china, hong kong, europe</span></li>
+</ul>
+
+<h2>united states</h2>
+<div class="table-wrap">
+<table class="quotes">
+  <thead>
+    <tr><th scope="col">Index</th><th scope="col">Level</th><th scope="col">Change</th><th scope="col">%</th></tr>
+  </thead>
+  <tbody>
+    <tr class="placeholder"><td><span class="session"></span>S&amp;P 500</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td><span class="session"></span>Nasdaq Composite</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td><span class="session"></span>Dow Jones Industrial Average</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>international</h2>
+<div class="table-wrap">
+<table class="quotes">
+  <thead>
+    <tr><th scope="col">Index</th><th scope="col">Level</th><th scope="col">Change</th><th scope="col">%</th></tr>
+  </thead>
+  <tbody>
+    <tr class="placeholder"><td><span class="session"></span>Nikkei 225 <span class="region">Japan</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td><span class="session"></span>KOSPI <span class="region">South Korea</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td><span class="session"></span>Shanghai Composite <span class="region">China</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td><span class="session"></span>Hang Seng <span class="region">Hong Kong</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td><span class="session"></span>STOXX Europe 600 <span class="region">Europe</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="source-note">Empty &mdash; no ingest has run yet. Dot shows whether the market was open at refresh.</p>
+
+</body>
+</html>
