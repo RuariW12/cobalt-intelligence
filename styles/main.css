@@ -436,7 +436,8 @@ h1.tech {
   color: var(--skeleton);
 }
 
-.region {
+.region,
+.unit {
   font-size: 14px;
   font-style: italic;
   color: var(--muted);
