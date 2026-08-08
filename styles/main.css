@@ -74,3 +74,41 @@ hr {
   font-size: 15px;
   font-style: italic;
 }
+
+/* masthead — tagline plus the refresh control, sat on one line */
+
+.masthead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.refresh {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+}
+
+.refresh svg {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.4s ease, color 0.15s ease;
+}
+
+.refresh:hover {
+  color: var(--accent);
+}
+
+.refresh:hover svg {
+  transform: rotate(180deg);
+}
+
+.refresh:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
