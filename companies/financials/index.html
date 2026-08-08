@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>financials &middot; cobalt</title>
+<link rel="stylesheet" href="/styles/main.css">
+<script src="/scripts/main.js" defer></script>
+</head>
+<body>
+
+<div class="crumb"><a href="/">cobalt</a> / <a href="/companies">key companies</a> / financials</div>
+
+<h1>Financials</h1>
+<div class="masthead">
+  <span class="meta">credit conditions and risk appetite &mdash; last refreshed: never</span>
+  <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="23 4 23 10 17 10"></polyline>
+      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+    </svg>
+  </button>
+</div>
+
+<hr>
+
+<section class="summary">
+  <h2>daily summary</h2>
+  <p class="summary-body meta">No summary yet. Refresh the data, then ask for one.</p>
+  <button type="button" class="ask" id="summarize">summarize</button>
+</section>
+
+<h2>companies</h2>
+<div class="table-wrap">
+<table class="quotes">
+  <thead>
+    <tr>
+      <th scope="col">Company</th>
+      <th scope="col">Ticker</th>
+      <th scope="col">Price</th>
+      <th scope="col">Change</th>
+      <th scope="col">%</th>
+      <th scope="col">Mkt cap</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="placeholder"><td>JPMorgan Chase</td><td class="ticker">JPM</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td>Bank of America</td><td class="ticker">BAC</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td>Goldman Sachs</td><td class="ticker">GS</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td>Berkshire Hathaway <span class="unit">class B</span></td><td class="ticker">BRK-B</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="source-note">Empty &mdash; no ingest has run yet. Berkshire is tracked on the class B
+share; class A (BRK-A) is the same company at roughly 1,500&times; the price per share.</p>
+
+<h2>related headlines</h2>
+<ul class="stories">
+  <li class="story placeholder">
+    <a class="headline" href="#">Headline text appears here, linking to the source</a>
+    <div class="byline">source &middot; &mdash;</div>
+  </li>
+  <li class="story placeholder">
+    <a class="headline" href="#">Headline text appears here, linking to the source</a>
+    <div class="byline">source &middot; &mdash;</div>
+  </li>
+</ul>
+
+</body>
+</html>

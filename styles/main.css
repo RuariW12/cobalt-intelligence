@@ -458,3 +458,11 @@ h1.tech {
 
 .session.open   { background: var(--up); }
 .session.closed { background: var(--muted); }
+
+/* ticker symbols — mono so they read as identifiers, not prose */
+
+.ticker {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--muted);
+}
