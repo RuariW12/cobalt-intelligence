@@ -29,8 +29,12 @@ services:
       TZ: ${TZ:-UTC}
       # Reachable whether ollama runs here, on the host, or on another box.
       OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:9b}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-cobalt}
       FRED_API_KEY: ${FRED_API_KEY:-}
+    # Reach the host's ollama from inside the bridge network. Ignored under
+    # host networking, where 127.0.0.1 already is the host.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     # No depends_on ollama: the app must start and serve pages whether or not a
     # model server exists. Only /api/summarize needs it, and it can fail alone.
@@ -74,7 +78,7 @@ services:
       - ollama
     environment:
       OLLAMA_HOST: http://ollama:11434
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:9b}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-cobalt}
     # depends_on only waits for the container, not for the server to listen,
     # so poll before pulling rather than racing it.
     entrypoint:
@@ -85,7 +89,7 @@ services:
           ollama list >/dev/null 2>&1 && break
           echo "waiting for ollama ($$i/60)"; sleep 2
         done
-        ollama pull "$${OLLAMA_MODEL:-qwen3:9b}"
+        ollama pull "$${OLLAMA_BASE_MODEL:-qwen3.5:9b}"
     profiles: ["llm"]
     restart: "no"
 

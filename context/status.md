@@ -15,6 +15,7 @@ cobalt/
   app/templates/          base.html + page.html — all 29 pages render from these
   etl/                    stub package; planned layout in its docstring
   requirements.txt        direct deps; requirements.lock pins everything
+  config/ollama/          Modelfile defining the "cobalt" model (ctx, temp, prompt)
   context/                this directory
   web/                    static assets only — the pages are rendered, not files
     styles/               8 files, main.css is the manifest
@@ -44,7 +45,8 @@ URLs are unchanged from the static version, and both `/sections/macro` and
 - No backend, no database, no ETL, no API integrations.
 - `#refresh` spins forever; `#summarize` shows the loader forever. Neither calls
   anything.
-- Ollama integration — deferred by the user.
+- Ollama integration — the model is configured and reachable, but nothing
+  calls it yet. `/api/summarize` still returns 501.
 
 ## Known data gaps
 

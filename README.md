@@ -49,48 +49,72 @@ mullvad lan set allow
 
 ## Running the local LLM
 
-The model server is **off by default** so a plain `up` doesn't idle several GB
-of RAM or trigger a multi-gigabyte download. Enable it with the `llm` profile.
-
-### 1. Pick a model
-
-Set `OLLAMA_MODEL` in `.env`. Sizing guide for a 12 GB GPU:
-
-| Model size | Q4 weights | Fits 12 GB with 16k context? |
-| --- | --- | --- |
-| 8–9B | ~5 GB | comfortably |
-| 14B | ~9 GB | yes, with `OLLAMA_KV_CACHE_TYPE=q8_0` |
-| 24B+ | 14 GB+ | no — spills to system RAM and crawls |
-
-Summarisation here is prefill-heavy (long input, short output), and CPU offload
-hurts prefill far more than generation, so staying inside VRAM matters more
-than parameter count.
-
-Verify the exact tag exists before setting it — model names change between
-generations:
-
 ```sh
 ./start.sh --llm
-docker compose -f docker/compose.yml exec ollama ollama list
 ```
 
-### 2. Start it and pull the weights
+That checks Ollama is up (starting the service if not), builds the **cobalt**
+model from `config/ollama/Modelfile`, points the app at it, and prints whether
+it landed on the GPU:
+
+```
+  cobalt is up -> http://localhost:5173
+  model        -> cobalt on http://127.0.0.1:11434
+  processor    -> 100% GPU
+```
+
+If that last line says CPU, the model is running perhaps 20x slower than it
+should — see below.
+
+### Ollama runs on the host, not in a container
+
+That is the default because it is the better trade with an NVIDIA card:
+
+- **No NVIDIA Container Toolkit needed.** Ollama talks to the driver directly.
+  Inside Docker it needs the toolkit, and without it falls back to CPU silently.
+- **No duplicate weights.** The model you already pulled is used as is, rather
+  than downloaded again into a volume.
+
+Install Ollama from <https://ollama.com>, then pull the base model:
 
 ```sh
-./start.sh --llm
-docker compose -f docker/compose.yml --profile llm run --rm model-init  # one-time
+ollama pull qwen3.5:9b          # or set OLLAMA_BASE_MODEL
 ```
 
-The weights land in the `ollama-models` volume, so `docker compose down` never
-costs you a re-download.
+To run it in Docker anyway: `./start.sh --container-ollama` — and read the GPU
+section below first, or it will be CPU-only.
 
----
+### Configuration
+
+`config/ollama/Modelfile` defines the **cobalt** model: context window, sampling
+parameters and system prompt, version-controlled in the repo. `./start.sh --llm`
+rebuilds it every run, which is cheap — it is a manifest over weights already on
+disk, not another copy.
+
+Two settings matter more than the rest:
+
+- **`num_ctx 16384`.** Ollama defaults to 4096 and truncates past it *silently*.
+  A day of headlines exceeds that, and the result looks like a working summary
+  of partial data rather than an error.
+- **`"think": false` on every request.** qwen3.5 is a reasoning model. Measured
+  on an RTX 4070 Super with the same prompt:
+
+  | | wall | tokens generated |
+  | --- | --- | --- |
+  | `think: true` | 52.7s | 3220 |
+  | `think: false` | **2.4s** | 124 |
+
+  The shorter run produced the better summary. This one cannot live in the
+  Modelfile — `PARAMETER think` is rejected — so it belongs in the request body.
 
 ## Using an NVIDIA GPU
 
+**Only needed if you run Ollama in a container** (`--container-ollama`). With
+the default host-native Ollama the GPU already works, and `./start.sh --llm`
+prints `processor -> 100% GPU` to prove it.
+
 Docker cannot see your GPU by default. Without the steps below the container
-starts and **silently runs on CPU** — for a 9B model that is the difference
-between seconds and minutes per summary.
+starts and **silently runs on CPU**.
 
 ### 1. Install the NVIDIA Container Toolkit
 
@@ -169,8 +193,8 @@ in [`context/etl-plan.md`](context/etl-plan.md).
 | --- | --- |
 | `web` | FastAPI. Serves the pages and the API on port 8000 in-container. |
 | `etl` | Same image, one-shot ingest command. |
-| `ollama` | Model server. `llm` profile only. |
-| `model-init` | Pulls the model, then exits. `llm` profile only. |
+| `ollama` | Model server — only for `--container-ollama`. By default Ollama runs on the host. |
+| `model-init` | Pulls the base weights into the container volume, then exits. Same caveat. |
 
 **There is no database service.** SQLite is a file, not a server; it lives in
 the `cobalt-data` volume that `web` and `etl` share. If this ever needs
@@ -178,6 +202,7 @@ concurrent writers or network access, that is when Postgres becomes a container.
 
 ```
 start.sh stop.sh   the supported way to run it
+config/ollama/     Modelfile defining the "cobalt" model
 app/               FastAPI service
 etl/               ingest pipeline (stub)
 web/               the served root — nothing outside this directory is public

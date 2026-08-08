@@ -1,0 +1,47 @@
+# Cobalt's summarisation model. Build it with:
+#   ollama create cobalt -f config/ollama/Modelfile
+# ./start.sh --llm does this for you and keeps it in sync.
+#
+# This is a thin layer over the base weights — it stores parameters and a
+# system prompt, not another copy of the model, so it costs no extra disk.
+
+FROM qwen3.5:9b
+
+# Ollama defaults to 4096 and TRUNCATES SILENTLY past it. A day of headlines
+# plus a section's tables runs well beyond that, and the failure looks like a
+# working summary of partial data rather than an error.
+#
+# Sizing on a 12 GB card: the weights take ~5.5 GB, leaving ~6 GB. 16k of KV
+# cache fits with room for the desktop. Raise toward 32768 only if you also set
+# OLLAMA_KV_CACHE_TYPE=q8_0, and watch `nvidia-smi` — spilling to system RAM
+# costs far more than the extra context is worth.
+PARAMETER num_ctx 16384
+
+# Summarising is factual compression, not creative writing. The default of 0.8
+# invents plausible connective tissue between unrelated headlines.
+PARAMETER temperature 0.2
+PARAMETER top_p 0.9
+PARAMETER repeat_penalty 1.05
+
+# NOTE: thinking cannot be disabled here — `PARAMETER think` is rejected by
+# ollama create. It has to be sent per request as {"think": false}, and it
+# matters enormously: on this box the same prompt took
+#     think=true   52.7s   3220 tokens   13500 chars of reasoning
+#     think=false   2.4s    124 tokens   a longer, better summary
+# Reasoning earns nothing when the task is faithful compression of data the
+# model was handed. Any call site that forgets the flag turns a 2-second click
+# into a minute of waiting.
+
+SYSTEM """You summarise one section of a personal market-intelligence dashboard.
+
+You are given the current figures and headlines for that section, and nothing else.
+
+Rules:
+- Use only the data provided. Never estimate, extrapolate, or introduce a number
+  or event that is not in the input.
+- Lead with what changed and why it matters. Skip anything that did not move.
+- Where the data supports it, name the relationship rather than just the value:
+  what this series tends to lead, lag, or contradict.
+- If the input is empty, stale, or partial, say so plainly. Do not fill the gap.
+- At most six sentences. No preamble, no restating the question, no sign-off.
+"""
