@@ -119,27 +119,41 @@ hr {
   outline-offset: 3px;
 }
 
-/* Refresh in progress. One full turn, then a half-second rest, forever — the
-   rest beat is baked into the keyframes as a hold at 360deg rather than a
-   separate delay, so the cycle never drifts. Colour steps once per turn, and
-   because the step lands during the rest the icon is motionless when it
-   changes. Dropping .spinning returns it to the resting grey. */
+/* Refresh in progress. One turn, then a half-second rest, forever — the rest
+   is a hold at 360deg inside the keyframes rather than a separate delay, so
+   the cycle never drifts. The two animations are phase-locked: 5.2s is exactly
+   four 1.3s turns, and the colour holds steady for the whole of each turn,
+   then blends to the next hue during the rest beat while the icon is still.
+   So motion and colour change never happen at the same moment.
+   Dropping .spinning returns it to the resting grey. */
 
 .refresh.spinning svg {
-  animation: refresh-spin 1.2s infinite ease-in-out,
-             refresh-cycle 4.8s infinite steps(1, end);
+  animation: refresh-spin 1.3s infinite,
+             refresh-cycle 5.2s infinite ease-in-out;
 }
+
+/* Per-keyframe timing: the turn accelerates and settles on its own curve,
+   independent of the flat hold that follows it. */
 
 @keyframes refresh-spin {
-  0%        { transform: rotate(0deg); }
-  58%, 100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  62%, 100% {
+    transform: rotate(360deg);
+  }
 }
 
+/* Each hue holds through its turn (to 62% of the block), then blends across
+   the rest beat. Block boundaries: 25% / 50% / 75%. */
+
 @keyframes refresh-cycle {
-  0%   { color: var(--accent); }
-  25%  { color: var(--politics); }
-  50%  { color: var(--economics); }
-  75%  { color: var(--tech); }
+  0%,   15.5% { color: var(--accent); }
+  25%,  40.5% { color: var(--politics); }
+  50%,  65.5% { color: var(--economics); }
+  75%,  90.5% { color: var(--tech); }
+  100%        { color: var(--accent); }
 }
 
 @media (prefers-reduced-motion: reduce) {
