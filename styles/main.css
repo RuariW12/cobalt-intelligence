@@ -119,6 +119,35 @@ hr {
   outline-offset: 3px;
 }
 
+/* Refresh in progress. One full turn, then a half-second rest, forever — the
+   rest beat is baked into the keyframes as a hold at 360deg rather than a
+   separate delay, so the cycle never drifts. Colour steps once per turn, and
+   because the step lands during the rest the icon is motionless when it
+   changes. Dropping .spinning returns it to the resting grey. */
+
+.refresh.spinning svg {
+  animation: refresh-spin 1.2s infinite ease-in-out,
+             refresh-cycle 4.8s infinite steps(1, end);
+}
+
+@keyframes refresh-spin {
+  0%        { transform: rotate(0deg); }
+  58%, 100% { transform: rotate(360deg); }
+}
+
+@keyframes refresh-cycle {
+  0%   { color: var(--accent); }
+  25%  { color: var(--politics); }
+  50%  { color: var(--economics); }
+  75%  { color: var(--tech); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes refresh-spin {
+    0%, 100% { transform: none; }
+  }
+}
+
 /* breadcrumb — every page but the home page */
 
 .crumb {
@@ -136,7 +165,7 @@ hr {
 
 .summary {
   border: 1px solid var(--rule);
-  border-left: 2px solid var(--accent);
+  border-left: 2px solid var(--text);
   padding: 14px 18px 16px;
   margin: 22px 0 30px;
 }
@@ -145,6 +174,7 @@ hr {
   margin-top: 0;
   border-bottom: none;
   padding-bottom: 0;
+  color: var(--text);
 }
 
 .summary-body {
@@ -156,17 +186,17 @@ hr {
   font-size: 15px;
   background: none;
   border: 1px solid var(--rule);
-  color: var(--accent);
+  color: var(--text);
   padding: 5px 13px;
   cursor: pointer;
 }
 
 .ask:hover {
-  border-color: var(--accent);
+  border-color: var(--text);
 }
 
 .ask:focus-visible {
-  outline: 1px solid var(--accent);
+  outline: 1px solid var(--text);
   outline-offset: 2px;
 }
 

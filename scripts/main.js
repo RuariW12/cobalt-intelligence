@@ -23,4 +23,20 @@ function initSummarize() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', initSummarize);
+// Refresh: spin the icon while an ingest runs. No ETL is connected yet, so it
+// spins indefinitely — removing .spinning is what returns it to resting grey.
+function initRefresh() {
+  const button = document.getElementById('refresh');
+  if (!button) return;
+
+  button.addEventListener('click', () => {
+    if (button.classList.contains('spinning')) return;
+    button.classList.add('spinning');
+    button.setAttribute('aria-busy', 'true');
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initSummarize();
+  initRefresh();
+});
