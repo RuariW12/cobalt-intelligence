@@ -1,0 +1,23 @@
+/* Home page only. Linked after main.css, so these override the base rules.
+
+   The index is a short, self-contained page with nothing to scan alongside it,
+   so it sits centred in the viewport. The data pages stay left-aligned — there
+   the eye returns to a fixed left edge down long tables, and a centred column
+   would move that edge with the window width. */
+
+body {
+  margin: 0 auto;
+  position: relative;
+}
+
+/* The toggle travels with the column instead of the viewport corner. Fixed to
+   the corner, it drifts far from the content on a wide screen once the column
+   is centred; absolute against the body keeps it beside the title.
+   `right` matches the body's 40px side padding, so it lines up with the right
+   edge of the content. `top` sits it on the optical centre of the h1. */
+
+.theme-toggle {
+  position: absolute;
+  top: 58px;
+  right: 40px;
+}
