@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bitcoin &middot; cobalt</title>
+<link rel="stylesheet" href="/styles/main.css">
+<script src="/scripts/main.js" defer></script>
+</head>
+<body>
+
+<div class="crumb"><a href="/">cobalt</a> / bitcoin</div>
+
+<h1>Bitcoin</h1>
+<div class="masthead">
+  <span class="meta">trades continuously &mdash; last refreshed: never</span>
+  <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="23 4 23 10 17 10"></polyline>
+      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+    </svg>
+  </button>
+</div>
+
+<hr>
+
+<section class="summary">
+  <h2>daily summary</h2>
+  <p class="summary-body meta">No summary yet. Refresh the data, then ask for one.</p>
+  <button type="button" class="ask" id="summarize">summarize</button>
+</section>
+
+<h2>price</h2>
+<div class="table-wrap">
+<table class="quotes">
+  <thead>
+    <tr>
+      <th scope="col">Pair</th>
+      <th scope="col">Price</th>
+      <th scope="col">24h</th>
+      <th scope="col">%</th>
+      <th scope="col">YTD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="placeholder">
+      <td>Bitcoin <span class="unit">BTC / USD</span></td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2>network &amp; market</h2>
+<ul class="metrics">
+  <li class="metric placeholder">
+    <span class="metric-name">Market capitalization</span>
+    <span class="metric-value">&mdash;</span>
+    <span class="metric-change">&mdash;</span>
+  </li>
+  <li class="metric placeholder">
+    <span class="metric-name">Dominance <span class="metric-period">share of total crypto cap</span></span>
+    <span class="metric-value">&mdash;</span>
+    <span class="metric-change">&mdash;</span>
+  </li>
+  <li class="metric placeholder">
+    <span class="metric-name">Hash rate <span class="metric-period">7-day average</span></span>
+    <span class="metric-value">&mdash;</span>
+    <span class="metric-change">&mdash;</span>
+  </li>
+  <li class="metric placeholder">
+    <span class="metric-name">Days since halving</span>
+    <span class="metric-value">&mdash;</span>
+    <span class="metric-change">&mdash;</span>
+  </li>
+</ul>
+
+<p class="source-note">Empty &mdash; no ingest has run yet. Bitcoin trades 24/7, so a
+&ldquo;daily change&rdquo; here is a rolling 24 hours, not a session close like the equity pages.</p>
+
+<h2>equity proxies</h2>
+<div class="table-wrap">
+<table class="quotes">
+  <thead>
+    <tr>
+      <th scope="col">Instrument</th>
+      <th scope="col">Ticker</th>
+      <th scope="col">Price</th>
+      <th scope="col">%</th>
+      <th scope="col">YTD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="placeholder">
+      <td>iShares Bitcoin Trust <span class="unit">spot ETF</span></td>
+      <td class="ticker">IBIT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+    <tr class="placeholder">
+      <td>Coinbase <span class="unit">exchange</span></td>
+      <td class="ticker">COIN</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+    <tr class="placeholder">
+      <td>Strategy <span class="unit">treasury holder</span></td>
+      <td class="ticker">MSTR</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p class="source-note">These trade on US hours while bitcoin does not, so they gap at the open
+against a coin price that moved overnight.</p>
+
+<h2>related headlines</h2>
+<ul class="stories">
+  <li class="story placeholder">
+    <a class="headline" href="#">Headline text appears here, linking to the source</a>
+    <div class="byline">source &middot; &mdash;</div>
+  </li>
+  <li class="story placeholder">
+    <a class="headline" href="#">Headline text appears here, linking to the source</a>
+    <div class="byline">source &middot; &mdash;</div>
+  </li>
+</ul>
+
+</body>
+</html>
