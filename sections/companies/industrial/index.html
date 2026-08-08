@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="companies">
 
 <div class="crumb"><a href="/">cobalt</a> / <a href="/sections/companies">key companies</a> / industrial</div>
 
 <h1>Industrial</h1>
 <div class="masthead">
-  <span class="meta">construction, agriculture, aerospace &mdash; last refreshed: never</span>
+  <span class="meta">construction, agriculture, aerospace &mdash; last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -45,11 +45,11 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder"><td>Caterpillar</td><td class="ticker">CAT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Deere</td><td class="ticker">DE</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Honeywell</td><td class="ticker">HON</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>GE Aerospace</td><td class="ticker">GE</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Siemens <span class="unit">ADR</span></td><td class="ticker">SIEGY</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="CAT"><td>Caterpillar</td><td class="ticker">CAT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="DE"><td>Deere</td><td class="ticker">DE</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="HON"><td>Honeywell</td><td class="ticker">HON</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="GE"><td>GE Aerospace</td><td class="ticker">GE</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="SIEGY"><td>Siemens <span class="unit">ADR</span></td><td class="ticker">SIEGY</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
   </tbody>
 </table>
 </div>

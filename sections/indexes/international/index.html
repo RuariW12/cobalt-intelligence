@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="indexes">
 
 <div class="crumb"><a href="/">cobalt</a> / <a href="/sections/indexes">market indexes</a> / international</div>
 
 <h1>International</h1>
 <div class="masthead">
-  <span class="meta">last refreshed: never</span>
+  <span class="meta">last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -44,19 +44,19 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="^N225">
       <td><span class="session"></span>Nikkei 225 <span class="region">Japan</span></td>
       <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="^KS11">
       <td><span class="session"></span>KOSPI <span class="region">South Korea</span></td>
       <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="000001.SS">
       <td><span class="session"></span>Shanghai Composite <span class="region">China</span></td>
       <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="^HSI">
       <td><span class="session"></span>Hang Seng <span class="region">Hong Kong</span></td>
       <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>
@@ -77,7 +77,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="^STOXX">
       <td><span class="session"></span>STOXX Europe 600 <span class="region">Europe</span></td>
       <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>

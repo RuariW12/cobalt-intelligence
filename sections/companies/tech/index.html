@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="companies">
 
 <div class="crumb"><a href="/">cobalt</a> / <a href="/sections/companies">key companies</a> / technology / ai</div>
 
 <h1>Technology / AI</h1>
 <div class="masthead">
-  <span class="meta">last refreshed: never</span>
+  <span class="meta">last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -45,10 +45,10 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder"><td>Microsoft</td><td class="ticker">MSFT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Amazon</td><td class="ticker">AMZN</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Alphabet</td><td class="ticker">GOOGL</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Apple</td><td class="ticker">AAPL</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="MSFT"><td>Microsoft</td><td class="ticker">MSFT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="AMZN"><td>Amazon</td><td class="ticker">AMZN</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="GOOGL"><td>Alphabet</td><td class="ticker">GOOGL</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="AAPL"><td>Apple</td><td class="ticker">AAPL</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
   </tbody>
 </table>
 </div>
@@ -67,9 +67,9 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder"><td>NVIDIA</td><td class="ticker">NVDA</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>TSMC <span class="unit">ADR</span></td><td class="ticker">TSM</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>ASML <span class="unit">ADR</span></td><td class="ticker">ASML</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="NVDA"><td>NVIDIA</td><td class="ticker">NVDA</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="TSM"><td>TSMC <span class="unit">ADR</span></td><td class="ticker">TSM</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="ASML"><td>ASML <span class="unit">ADR</span></td><td class="ticker">ASML</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
   </tbody>
 </table>
 </div>

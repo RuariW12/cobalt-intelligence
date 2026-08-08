@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="macro">
 
 <div class="crumb"><a href="/">cobalt</a> / <a href="/sections/macro">macroeconomics</a> / inflation</div>
 
 <h1 class="green">Inflation</h1>
 <div class="masthead">
-  <span class="meta">last refreshed: never</span>
+  <span class="meta">last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -33,27 +33,27 @@
 
 <h2>series</h2>
 <ul class="metrics">
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-series="CPIAUCSL">
     <span class="metric-name">CPI <span class="metric-period">year over year</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-series="CPILFESL">
     <span class="metric-name">Core CPI <span class="metric-period">year over year</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-series="PCEPI">
     <span class="metric-name">PCE <span class="metric-period">year over year</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-series="PCEPILFE">
     <span class="metric-name">Core PCE <span class="metric-period">year over year</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-series="PPIFIS">
     <span class="metric-name">PPI <span class="metric-period">year over year</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>

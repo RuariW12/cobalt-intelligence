@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="macro">
 
 <div class="crumb"><a href="/">cobalt</a> / macroeconomics</div>
 
 <h1 class="green">Macroeconomics</h1>
 <div class="masthead">
-  <span class="meta">health and direction of the economy &mdash; last refreshed: never</span>
+  <span class="meta">health and direction of the economy &mdash; last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -38,41 +38,7 @@
   <li><a href="/sections/macro/growth">growth</a> <span class="meta">gdp, retail sales, production, pmi, housing</span></li>
 </ul>
 
-<h2>snapshot</h2>
-<ul class="metrics">
-  <li class="metric placeholder">
-    <span class="metric-name">CPI <span class="metric-period">year over year</span></span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">Core PCE <span class="metric-period">year over year</span></span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">Unemployment rate</span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">Nonfarm payrolls <span class="metric-period">monthly change</span></span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">Real GDP <span class="metric-period">quarterly, annualized</span></span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">ISM Manufacturing PMI</span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-</ul>
-
-<p class="source-note">Empty &mdash; no ingest has run yet. Source and release date appear here.</p>
+<p class="source-note">This page is an index. Figures live on the pages above; refreshing here refreshes all of them.</p>
 
 </body>
 </html>

@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="indexes">
 
 <div class="crumb"><a href="/">cobalt</a> / market indexes</div>
 
 <h1>Market Indexes</h1>
 <div class="masthead">
-  <span class="meta">major equity markets &mdash; last refreshed: never</span>
+  <span class="meta">major equity markets &mdash; last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -37,37 +37,7 @@
   <li><a href="/sections/indexes/international">international</a> <span class="meta">japan, korea, china, hong kong, europe</span></li>
 </ul>
 
-<h2>united states</h2>
-<div class="table-wrap">
-<table class="quotes">
-  <thead>
-    <tr><th scope="col">Index</th><th scope="col">Level</th><th scope="col">Change</th><th scope="col">%</th></tr>
-  </thead>
-  <tbody>
-    <tr class="placeholder"><td><span class="session"></span>S&amp;P 500</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td><span class="session"></span>Nasdaq Composite</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td><span class="session"></span>Dow Jones Industrial Average</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-  </tbody>
-</table>
-</div>
-
-<h2>international</h2>
-<div class="table-wrap">
-<table class="quotes">
-  <thead>
-    <tr><th scope="col">Index</th><th scope="col">Level</th><th scope="col">Change</th><th scope="col">%</th></tr>
-  </thead>
-  <tbody>
-    <tr class="placeholder"><td><span class="session"></span>Nikkei 225 <span class="region">Japan</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td><span class="session"></span>KOSPI <span class="region">South Korea</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td><span class="session"></span>Shanghai Composite <span class="region">China</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td><span class="session"></span>Hang Seng <span class="region">Hong Kong</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td><span class="session"></span>STOXX Europe 600 <span class="region">Europe</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-  </tbody>
-</table>
-</div>
-
-<p class="source-note">Empty &mdash; no ingest has run yet. Dot shows whether the market was open at refresh.</p>
+<p class="source-note">This page is an index. Figures live on the pages above; refreshing here refreshes all of them.</p>
 
 </body>
 </html>

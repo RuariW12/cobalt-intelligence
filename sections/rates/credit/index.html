@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="rates">
 
 <div class="crumb"><a href="/">cobalt</a> / <a href="/sections/rates">interest rates &amp; credit</a> / credit spreads</div>
 
 <h1 class="green">Credit Spreads</h1>
 <div class="masthead">
-  <span class="meta">availability and price of credit &mdash; last refreshed: never</span>
+  <span class="meta">availability and price of credit &mdash; last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -33,12 +33,12 @@
 
 <h2>spreads</h2>
 <ul class="metrics">
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-series="BAMLC0A0CM">
     <span class="metric-name">Investment grade <span class="metric-period">option-adjusted, bps</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-series="BAMLH0A0HYM2">
     <span class="metric-name">High yield <span class="metric-period">option-adjusted, bps</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>

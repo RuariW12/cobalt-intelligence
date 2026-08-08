@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="etfs">
 
 <div class="crumb"><a href="/">cobalt</a> / <a href="/sections/etfs">etfs</a> / broad market</div>
 
 <h1>Broad Market</h1>
 <div class="masthead">
-  <span class="meta">last refreshed: never</span>
+  <span class="meta">last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -45,23 +45,23 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="VTI">
       <td>US total market <span class="unit">Vanguard</span></td>
       <td class="ticker">VTI</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="^GSPC">
       <td>S&amp;P 500 <span class="unit">Vanguard</span></td>
       <td class="ticker">VOO</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="QQQ">
       <td>Nasdaq-100 <span class="unit">Invesco</span></td>
       <td class="ticker">QQQ</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="IWM">
       <td>Russell 2000 <span class="unit">small cap</span></td>
       <td class="ticker">IWM</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="VT">
       <td>Global equities <span class="unit">Vanguard</span></td>
       <td class="ticker">VT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>
@@ -71,7 +71,7 @@
 
 <h2>breadth</h2>
 <ul class="metrics">
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-derived="qqq-iwm-ytd">
     <span class="metric-name">QQQ &minus; IWM <span class="metric-period">large-cap tech vs small caps, YTD</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>

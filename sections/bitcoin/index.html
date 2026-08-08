@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="bitcoin">
 
 <div class="crumb"><a href="/">cobalt</a> / bitcoin</div>
 
 <h1 class="gold">Bitcoin</h1>
 <div class="masthead">
-  <span class="meta">trades continuously &mdash; last refreshed: never</span>
+  <span class="meta">trades continuously &mdash; last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -44,7 +44,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="BTC-USD">
       <td>Bitcoin <span class="unit">BTC / USD</span></td>
       <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
     </tr>

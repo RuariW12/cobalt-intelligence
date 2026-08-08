@@ -7,13 +7,14 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="commodities">
 
 <div class="crumb"><a href="/">cobalt</a> / commodities &amp; materials</div>
 
 <h1 class="clay">Commodities &amp; Materials</h1>
 <div class="masthead">
-  <span class="meta">strategically important physical commodities &mdash; last refreshed: never</span>
+  <span class="meta">physical prices &mdash; last refreshed:
+    <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -31,36 +32,122 @@
   <button type="button" class="ask" id="summarize">summarize</button>
 </section>
 
-<h2>sections</h2>
-<ul>
-  <li><a href="/sections/commodities/precious">precious metals</a> <span class="meta">gold, silver</span></li>
-  <li><a href="/sections/commodities/industrial">industrial &amp; battery metals</a> <span class="meta">copper, tungsten, aluminum, iron ore, lithium, nickel, cobalt</span></li>
-  <li><a href="/sections/commodities/energy">energy</a> <span class="meta">uranium, wti, brent, natural gas</span></li>
-</ul>
-
-<h2>snapshot</h2>
+<h2>precious</h2>
 <div class="table-wrap">
-<table class="quotes">
+<table class="quotes" data-source="yahoo">
   <thead>
     <tr>
-      <th scope="col">Commodity</th>
+      <th scope="col">Metal</th>
       <th scope="col">Price</th>
       <th scope="col">Change</th>
       <th scope="col">%</th>
+      <th scope="col">YTD</th>
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder"><td>Gold <span class="unit">USD / troy oz</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Silver <span class="unit">USD / troy oz</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Copper <span class="unit">USD / lb</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>WTI crude <span class="unit">USD / bbl</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Brent crude <span class="unit">USD / bbl</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Natural gas <span class="unit">USD / MMBtu</span></td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="GC=F">
+      <td>Gold <span class="unit">USD / troy oz</span></td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+    <tr class="placeholder" data-symbol="SI=F">
+      <td>Silver <span class="unit">USD / troy oz</span></td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
   </tbody>
 </table>
 </div>
 
-<p class="source-note">Empty &mdash; no ingest has run yet. Source and quote time appear here.</p>
+<ul class="metrics">
+  <li class="metric placeholder" data-derived="gold-silver-ratio">
+    <span class="metric-name">Gold / silver ratio <span class="metric-period">ounces of silver per ounce of gold</span></span>
+    <span class="metric-value">&mdash;</span>
+    <span class="metric-change">&mdash;</span>
+  </li>
+</ul>
+
+<h2>industrial</h2>
+<div class="table-wrap">
+<table class="quotes" data-source="yahoo">
+  <thead>
+    <tr>
+      <th scope="col">Metal</th>
+      <th scope="col">Price</th>
+      <th scope="col">Change</th>
+      <th scope="col">%</th>
+      <th scope="col">YTD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="placeholder" data-symbol="HG=F">
+      <td>Copper <span class="unit">USD / lb</span></td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+    <tr class="placeholder" data-symbol="ALI=F">
+      <td>Aluminum <span class="unit">USD / tonne</span></td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h2>energy</h2>
+<div class="table-wrap">
+<table class="quotes" data-source="yahoo">
+  <thead>
+    <tr>
+      <th scope="col">Contract</th>
+      <th scope="col">Price</th>
+      <th scope="col">Change</th>
+      <th scope="col">%</th>
+      <th scope="col">YTD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="placeholder" data-symbol="CL=F">
+      <td>WTI crude <span class="unit">USD / bbl</span></td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+    <tr class="placeholder" data-symbol="BZ=F">
+      <td>Brent crude <span class="unit">USD / bbl</span></td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+    <tr class="placeholder" data-symbol="NG=F">
+      <td>Natural gas <span class="unit">USD / MMBtu</span></td>
+      <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<ul class="metrics">
+  <li class="metric placeholder" data-derived="brent-wti-spread">
+    <span class="metric-name">Brent &ndash; WTI <span class="metric-period">USD / bbl</span></span>
+    <span class="metric-value">&mdash;</span>
+    <span class="metric-change">&mdash;</span>
+  </li>
+</ul>
+
+<p class="source-note">Empty &mdash; no ingest has run yet. Aluminum trades thinly and its
+quote can lag the others by a session.</p>
+
+<h2>not priced here</h2>
+<ul>
+  <li class="meta">tungsten, uranium, lithium, cobalt, iron ore, nickel</li>
+  <li><a href="/sections/etfs/materials">tracked via materials ETFs</a>
+      <span class="meta">no free spot feed exists for these</span></li>
+</ul>
+
+<h2>related headlines</h2>
+<ul class="stories" data-source="news" data-tags="gold,silver,copper,oil,natural-gas">
+  <li class="story placeholder">
+    <a class="headline" href="#">Headline text appears here, linking to the source</a>
+    <div class="byline">source &middot; &mdash;</div>
+  </li>
+  <li class="story placeholder">
+    <a class="headline" href="#">Headline text appears here, linking to the source</a>
+    <div class="byline">source &middot; &mdash;</div>
+  </li>
+</ul>
 
 </body>
 </html>

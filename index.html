@@ -7,11 +7,11 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="home">
 
 <h1>Cobalt</h1>
 <div class="masthead">
-  <span class="meta">personal intelligence platform &mdash; last refreshed: never</span>
+  <span class="meta">personal intelligence platform &mdash; last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh all data" aria-label="Refresh all data">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -55,10 +55,7 @@
 
 <h2>commodities &amp; materials</h2>
 <ul>
-  <li><a href="/sections/commodities">overview</a></li>
-  <li><a href="/sections/commodities/precious">precious metals</a> <span class="meta">gold, silver</span></li>
-  <li><a href="/sections/commodities/industrial">industrial &amp; battery metals</a> <span class="meta">copper, tungsten, aluminum, iron ore, lithium, nickel, cobalt</span></li>
-  <li><a href="/sections/commodities/energy">energy</a> <span class="meta">uranium, wti crude, brent crude, natural gas</span></li>
+    <li><a href="/sections/commodities">prices</a> <span class="meta">gold, silver, copper, aluminum, wti, brent, natural gas</span></li>
 </ul>
 
 <h2>key companies</h2>

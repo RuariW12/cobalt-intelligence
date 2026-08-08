@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="rates">
 
 <div class="crumb"><a href="/">cobalt</a> / interest rates &amp; credit</div>
 
 <h1 class="green">Interest Rates &amp; Credit</h1>
 <div class="masthead">
-  <span class="meta">monetary policy and the cost of capital &mdash; last refreshed: never</span>
+  <span class="meta">monetary policy and the cost of capital &mdash; last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -37,41 +37,7 @@
   <li><a href="/sections/rates/credit">credit spreads</a> <span class="meta">investment grade, high yield</span></li>
 </ul>
 
-<h2>snapshot</h2>
-<ul class="metrics">
-  <li class="metric placeholder">
-    <span class="metric-name">Federal Funds Rate <span class="metric-period">upper bound</span></span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">2-Year Treasury</span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">10-Year Treasury</span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">10Y&ndash;2Y spread <span class="metric-period">curve slope</span></span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">Investment-grade spread <span class="metric-period">option-adjusted</span></span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-  <li class="metric placeholder">
-    <span class="metric-name">High-yield spread <span class="metric-period">option-adjusted</span></span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
-  </li>
-</ul>
-
-<p class="source-note">Empty &mdash; no ingest has run yet. Source and release date appear here.</p>
+<p class="source-note">This page is an index. Figures live on the pages above; refreshing here refreshes all of them.</p>
 
 </body>
 </html>

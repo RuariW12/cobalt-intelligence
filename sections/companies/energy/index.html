@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="companies">
 
 <div class="crumb"><a href="/">cobalt</a> / <a href="/sections/companies">key companies</a> / energy</div>
 
 <h1>Energy</h1>
 <div class="masthead">
-  <span class="meta">last refreshed: never</span>
+  <span class="meta">last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -45,9 +45,9 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder"><td>ExxonMobil</td><td class="ticker">XOM</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Chevron</td><td class="ticker">CVX</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>ConocoPhillips</td><td class="ticker">COP</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="XOM"><td>ExxonMobil</td><td class="ticker">XOM</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="CVX"><td>Chevron</td><td class="ticker">CVX</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="COP"><td>ConocoPhillips</td><td class="ticker">COP</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
   </tbody>
 </table>
 </div>
@@ -66,7 +66,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder">
+    <tr class="placeholder" data-symbol="2222.SR">
       <td>Saudi Aramco <span class="unit">SAR &middot; Tadawul</span></td>
       <td class="ticker">2222.SR</td>
       <td>&mdash;</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td>

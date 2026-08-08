@@ -7,13 +7,13 @@
 <link rel="stylesheet" href="/styles/main.css">
 <script src="/scripts/main.js" defer></script>
 </head>
-<body>
+<body data-section="ai-bubble">
 
 <div class="crumb"><a href="/">cobalt</a> / ai bubble tracker</div>
 
 <h1 class="violet">AI Bubble Tracker</h1>
 <div class="masthead">
-  <span class="meta">where the money is going and what it is priced for &mdash; last refreshed: never</span>
+  <span class="meta">where the money is going and what it is priced for &mdash; last refreshed: <span class="refreshed" data-refreshed="">never</span></span>
   <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -33,23 +33,23 @@
 
 <h2>concentration</h2>
 <ul class="metrics">
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-derived="nvda-sp500-weight" data-source="holdings">
     <span class="metric-name">NVIDIA weight in S&amp;P 500</span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-derived="sp500-top10-weight" data-source="holdings">
     <span class="metric-name">Top 10 weight in S&amp;P 500</span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-derived="spy-rsp-ytd">
     <span class="metric-name">SPY &minus; RSP <span class="metric-period">cap-weighted vs equal-weight, YTD</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
-    <span class="metric-name">Nasdaq-100 forward P/E</span>
+  <li class="metric placeholder" data-derived="ndx-trailing-pe">
+    <span class="metric-name">Nasdaq-100 P/E <span class="metric-period">trailing &mdash; forward estimates are licensed</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
@@ -65,17 +65,17 @@ direct bubble read: how much of the index is one trade.</p>
     <tr>
       <th scope="col">Company</th>
       <th scope="col">Ticker</th>
-      <th scope="col">Price</th>
-      <th scope="col">%</th>
       <th scope="col">Mkt cap</th>
+      <th scope="col">%</th>
+      <th scope="col">S&amp;P weight</th>
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder"><td>NVIDIA</td><td class="ticker">NVDA</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Broadcom</td><td class="ticker">AVGO</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>AMD</td><td class="ticker">AMD</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>TSMC <span class="unit">ADR</span></td><td class="ticker">TSM</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>ASML <span class="unit">ADR</span></td><td class="ticker">ASML</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="NVDA"><td>NVIDIA</td><td class="ticker">NVDA</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="AVGO"><td>Broadcom</td><td class="ticker">AVGO</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="AMD"><td>AMD</td><td class="ticker">AMD</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="TSM"><td>TSMC <span class="unit">ADR</span></td><td class="ticker">TSM</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="ASML"><td>ASML <span class="unit">ADR</span></td><td class="ticker">ASML</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
   </tbody>
 </table>
 </div>
@@ -87,23 +87,25 @@ direct bubble read: how much of the index is one trade.</p>
     <tr>
       <th scope="col">Company</th>
       <th scope="col">Ticker</th>
-      <th scope="col">Price</th>
+      <th scope="col">Mkt cap</th>
       <th scope="col">%</th>
       <th scope="col">Capex guide</th>
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder"><td>Microsoft</td><td class="ticker">MSFT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Alphabet</td><td class="ticker">GOOGL</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Amazon</td><td class="ticker">AMZN</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Meta</td><td class="ticker">META</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Oracle</td><td class="ticker">ORCL</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="MSFT"><td>Microsoft</td><td class="ticker">MSFT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="GOOGL"><td>Alphabet</td><td class="ticker">GOOGL</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="AMZN"><td>Amazon</td><td class="ticker">AMZN</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="META"><td>Meta</td><td class="ticker">META</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="ORCL"><td>Oracle</td><td class="ticker">ORCL</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
   </tbody>
 </table>
 </div>
 
 <p class="source-note">Capex guidance is stated on quarterly earnings calls, not quoted &mdash; it
-updates four times a year, and it is the number that decides whether chip demand holds.</p>
+updates four times a year, and it is the number that decides whether chip demand holds.
+Prices for the names also on <a href="/sections/companies/tech">companies / tech</a> live there;
+this page carries only what a sector page cannot show.</p>
 
 <h2>buildout &amp; power</h2>
 <div class="table-wrap">
@@ -112,33 +114,33 @@ updates four times a year, and it is the number that decides whether chip demand
     <tr>
       <th scope="col">Company</th>
       <th scope="col">Ticker</th>
-      <th scope="col">Price</th>
-      <th scope="col">%</th>
       <th scope="col">Mkt cap</th>
+      <th scope="col">%</th>
+      <th scope="col">S&amp;P weight</th>
     </tr>
   </thead>
   <tbody>
-    <tr class="placeholder"><td>CoreWeave <span class="unit">GPU cloud</span></td><td class="ticker">CRWV</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Super Micro <span class="unit">servers</span></td><td class="ticker">SMCI</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Vertiv <span class="unit">power &amp; cooling</span></td><td class="ticker">VRT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
-    <tr class="placeholder"><td>Constellation Energy <span class="unit">nuclear</span></td><td class="ticker">CEG</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="CRWV"><td>CoreWeave <span class="unit">GPU cloud</span></td><td class="ticker">CRWV</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="SMCI"><td>Super Micro <span class="unit">servers</span></td><td class="ticker">SMCI</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="VRT"><td>Vertiv <span class="unit">power &amp; cooling</span></td><td class="ticker">VRT</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder" data-symbol="CEG"><td>Constellation Energy <span class="unit">nuclear</span></td><td class="ticker">CEG</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
   </tbody>
 </table>
 </div>
 
 <h2>private &middot; no ticker</h2>
 <ul class="metrics">
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-manual="news">
     <span class="metric-name">OpenAI <span class="metric-period">last round valuation</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-manual="news">
     <span class="metric-name">Anthropic <span class="metric-period">last round valuation</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
   </li>
-  <li class="metric placeholder">
+  <li class="metric placeholder" data-manual="news">
     <span class="metric-name">xAI <span class="metric-period">last round valuation</span></span>
     <span class="metric-value">&mdash;</span>
     <span class="metric-change">&mdash;</span>
@@ -161,8 +163,9 @@ cycle from a bubble, and they surface in filings and reporting rather than in pr
 
 <h2>downstream demand</h2>
 <ul>
-  <li><a href="/sections/commodities/energy">uranium &amp; natural gas</a> <span class="meta">datacenter power</span></li>
-  <li><a href="/sections/commodities/industrial">copper</a> <span class="meta">grid and interconnect buildout</span></li>
+  <li><a href="/sections/commodities">natural gas</a> <span class="meta">datacenter power</span></li>
+  <li><a href="/sections/etfs/materials">uranium</a> <span class="meta">via URA &mdash; no free spot feed</span></li>
+  <li><a href="/sections/commodities">copper</a> <span class="meta">grid and interconnect buildout</span></li>
   <li><a href="/sections/etfs/materials">URA, SETM</a> <span class="meta">tradeable proxies</span></li>
 </ul>
 
