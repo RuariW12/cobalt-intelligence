@@ -99,3 +99,52 @@ h1.clay   { color: var(--clay); }
 h1.green  { color: var(--green); }
 h1.violet { color: var(--violet); }
 h1.gold   { color: var(--gold); }
+
+/* theme toggle — page chrome, pinned to the viewport corner rather than the
+   content column, so it stays put on every page regardless of length */
+
+body {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  background: none;
+  border: none;
+  padding: 6px;
+  margin: 0;
+  line-height: 0;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.theme-toggle:hover {
+  color: var(--blue);
+}
+
+.theme-toggle:focus-visible {
+  outline: 1px solid var(--blue);
+  outline-offset: 3px;
+}
+
+/* the icon shows the mode you are in: moon at night, sun by day */
+
+.icon-sun {
+  display: none;
+}
+
+:root[data-theme="light"] .icon-moon {
+  display: none;
+}
+
+:root[data-theme="light"] .icon-sun {
+  display: block;
+}

@@ -36,7 +36,41 @@ function initRefresh() {
   });
 }
 
+// Day/night toggle. The icon swap is done in CSS off the data-theme attribute;
+// this only flips the attribute, remembers it, and keeps the label truthful.
+function initTheme() {
+  const button = document.getElementById('theme-toggle');
+  if (!button) return;
+
+  const root = document.documentElement;
+  const isLight = () => root.getAttribute('data-theme') === 'light';
+
+  const relabel = () => {
+    const next = isLight() ? 'night' : 'day';
+    button.title = `Switch to ${next} mode`;
+    button.setAttribute('aria-label', `Switch to ${next} mode`);
+  };
+
+  relabel();
+
+  button.addEventListener('click', () => {
+    const light = isLight();
+    if (light) {
+      root.removeAttribute('data-theme');
+    } else {
+      root.setAttribute('data-theme', 'light');
+    }
+    try {
+      localStorage.setItem('cobalt-theme', light ? 'dark' : 'light');
+    } catch (e) {
+      /* not persisted; the toggle still works for this page view */
+    }
+    relabel();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initSummarize();
   initRefresh();
+  initTheme();
 });

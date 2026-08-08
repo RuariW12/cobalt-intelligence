@@ -19,3 +19,24 @@
   --violet: #b79ce8;
   --gold: #e0bf7a;
 }
+
+/* Day mode. Same five hues, darkened for contrast — the pastels that read well
+   on #1a1a1a drop below usable contrast on a light ground, so each is a deeper
+   version of itself rather than a different colour. Ground is a warm off-white,
+   not paper-white, so it sits with the clay and gold. */
+
+:root[data-theme="light"] {
+  --bg: #faf9f7;
+  --text: #1a1a1a;
+  --muted: #6a6a6a;
+  --blue: #2f6fd0;
+  --rule: #dddad5;
+  --skeleton: #bab6b0;
+  --up: #2e7d55;
+  --down: #c0392b;
+
+  --clay: #b0563c;
+  --green: #2e7d55;
+  --violet: #6a45ab;
+  --gold: #8a6a1f;
+}
