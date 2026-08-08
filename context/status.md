@@ -15,10 +15,16 @@ cobalt/
 
 Static only. `serve.sh` runs Python's stdlib file server — there is no backend.
 
+## Routes the home page links to
+
+`/news` · `/macro` · `/rates` · `/indexes` · `/commodities` · `/companies` ·
+`/etfs` · `/ai-bubble` · `/bitcoin` · `/relationships`, plus sub-routes under
+each. None exist yet.
+
 ## Not built yet
 
-- Every link on the home page points at a route that does not exist (`/news`,
-  `/econ/metals`, ...). They 404 today.
+- Every link on the home page points at a route that does not exist. They 404
+  today.
 - `#refresh` on the home page is a placeholder with no handler.
 - No backend, no database, no ETL, no API integrations.
 - Ollama integration — deferred by the user.

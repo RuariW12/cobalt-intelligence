@@ -7,6 +7,7 @@ and conventions to follow. Code explains *what*; this explains *why*.
 | File | Contents |
 | --- | --- |
 | `project.md` | The spec: what Cobalt is meant to be, in full. |
+| `updated-context.md` | Source of truth for *what* gets tracked — every metric, ticker, and relationship chain. Written by the user. |
 | `conventions.md` | Rules for how code in this repo is written. |
 | `status.md` | What exists today and what's next. Update as work lands. |
 
