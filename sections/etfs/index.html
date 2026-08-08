@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>etfs &middot; cobalt</title>
+<link rel="stylesheet" href="/styles/main.css">
+<script src="/scripts/main.js" defer></script>
+</head>
+<body>
+
+<div class="crumb"><a href="/">cobalt</a> / etfs</div>
+
+<h1>ETFs</h1>
+<div class="masthead">
+  <span class="meta">sector, asset-class and commodity indicators &mdash; last refreshed: never</span>
+  <button type="button" id="refresh" class="refresh" title="Refresh this page" aria-label="Refresh this page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="23 4 23 10 17 10"></polyline>
+      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+    </svg>
+  </button>
+</div>
+
+<hr>
+
+<section class="summary">
+  <h2>daily summary</h2>
+  <p class="summary-body meta">No summary yet. Refresh the data, then ask for one.</p>
+  <button type="button" class="ask" id="summarize">summarize</button>
+</section>
+
+<h2>sections</h2>
+<ul>
+  <li><a href="/sections/etfs/broad">broad market</a> <span class="meta">vti, voo, qqq, iwm, vt</span></li>
+  <li><a href="/sections/etfs/international">international</a> <span class="meta">vxus, eem</span></li>
+  <li><a href="/sections/etfs/materials">materials &amp; commodities</a> <span class="meta">remx, setm, copx, lit, ura, gdx, slv, pplt, pall</span></li>
+</ul>
+
+<h2>snapshot</h2>
+<div class="table-wrap">
+<table class="quotes">
+  <thead>
+    <tr>
+      <th scope="col">Fund</th>
+      <th scope="col">Ticker</th>
+      <th scope="col">Price</th>
+      <th scope="col">Change</th>
+      <th scope="col">%</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="placeholder"><td>US total market</td><td class="ticker">VTI</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td>S&amp;P 500</td><td class="ticker">VOO</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td>Nasdaq-100</td><td class="ticker">QQQ</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td>International ex-US</td><td class="ticker">VXUS</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+    <tr class="placeholder"><td>Gold miners</td><td class="ticker">GDX</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="source-note">Empty &mdash; no ingest has run yet. Source and quote time appear here.</p>
+
+</body>
+</html>
