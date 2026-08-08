@@ -3,8 +3,8 @@
 body {
   background: #1a1a1a;
   color: #ffffff;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 15px;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 20px;
   line-height: 1.6;
   margin: 0;
   padding: 40px;
@@ -12,15 +12,16 @@ body {
 }
 
 h1 {
-  font-size: 20px;
-  font-weight: normal;
+  font-size: 30px;
   margin: 0 0 4px 0;
+  font-weight: normal;
+  color:#7fb3ff;
 }
 
 h2 {
-  font-size: 15px;
+  font-size: 25px;
   font-weight: normal;
-  color: #9a9a9a;
+  color:#94bcf8;
   margin: 28px 0 6px 0;
 }
 :where
@@ -47,6 +48,8 @@ hr {
   border-top: 1px solid #444;
   margin: 20px 0;
 }
+
+
 
 .meta {
   color: #7a7a7a;
