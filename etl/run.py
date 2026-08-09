@@ -147,13 +147,17 @@ def ingest(section: str = "all") -> dict:
     sync_instruments()
     insts = db.instruments()
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    symbols, series = targets(section)
+    symbols, series_ids = targets(section)
 
     result = {"section": section, "written": 0, "documents": 0, "failed": [], "sources": {}}
 
     if symbols:
         run_id = db.start_run(section, "yahoo", now)
-        rows, failed = yahoo.fetch(symbols)
+        rows, failed, history = yahoo.fetch(symbols)
+        # The quote response already contains the year's closes; storing them
+        # makes the charts free rather than a second round of requests.
+        for sym, points in history.items():
+            db.write_history(sym, points)
         written, suspect, docs = store_rows(rows, insts)
         db.finish_run(run_id, datetime.now(timezone.utc).isoformat(timespec="seconds"),
                       "ok" if not failed else "partial", written,
@@ -164,13 +168,13 @@ def ingest(section: str = "all") -> dict:
         result["sources"]["yahoo"] = {"requested": len(symbols), "written": written,
                                       "failed": len(failed), "suspect": suspect}
 
-    if series:
+    if series_ids:
         if not fred.available():
-            result["sources"]["fred"] = {"requested": len(series), "written": 0,
+            result["sources"]["fred"] = {"requested": len(series_ids), "written": 0,
                                          "skipped": "FRED_API_KEY not set"}
         else:
             run_id = db.start_run(section, "fred", now)
-            rows, failed = fred.fetch(series)
+            rows, failed = fred.fetch(series_ids)
             written, suspect, docs = store_rows(rows, insts)
             db.finish_run(run_id, datetime.now(timezone.utc).isoformat(timespec="seconds"),
                           "ok" if not failed else "partial", written,
@@ -178,7 +182,7 @@ def ingest(section: str = "all") -> dict:
             result["written"] += written
             result["documents"] += docs
             result["failed"] += failed
-            result["sources"]["fred"] = {"requested": len(series), "written": written,
+            result["sources"]["fred"] = {"requested": len(series_ids), "written": written,
                                          "failed": len(failed), "suspect": suspect}
 
     derived = compute_derived()

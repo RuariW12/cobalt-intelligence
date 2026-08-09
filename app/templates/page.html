@@ -66,6 +66,33 @@
   </li>
   {%- endfor %}
 </ul>
+{%- elif p.type == 'chart' %}
+<div class="chart" data-key="{{ p.instruments[0].key }}" data-range="{{ p.default_range }}">
+  <div class="chart-controls">
+    <div class="chart-pick">
+      {%- for i in p.instruments %}
+      <button type="button" data-key="{{ i.key }}"{% if loop.first %} class="on"{% endif %}>{{ i.label|safe }}</button>
+      {%- endfor %}
+    </div>
+    <div class="chart-range">
+      {%- for r in p.ranges %}
+      <button type="button" data-range="{{ r }}"{% if r == p.default_range %} class="on"{% endif %}>{{ r }}</button>
+      {%- endfor %}
+    </div>
+  </div>
+  {#- Its own row: the hover readout replaces the resting value here rather
+      than floating over the plot, so no two pieces of text can collide. -#}
+  <div class="chart-head">
+    <span class="chart-title meta"></span>
+    <span class="chart-readout"></span>
+  </div>
+  <div class="chart-frame">
+    <svg class="chart-svg" role="img" aria-label="price history"></svg>
+  </div>
+  <div class="chart-foot">
+    <span class="chart-span meta"></span>
+  </div>
+</div>
 {%- elif p.type == 'note' %}
 <p class="{{ p.style if p.style else 'source-note' }}">{{ p.text|safe }}</p>
 {%- endif %}

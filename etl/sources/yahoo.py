@@ -62,10 +62,49 @@ def _ytd_pct(result: dict, price: float) -> float | None:
         return None
 
 
-def fetch(symbols: list[str], timeout: float = 15.0) -> tuple[list[dict], list[str]]:
-    """Return (observations, failed_symbols)."""
+def _closes(result: dict) -> list[tuple[str, float]]:
+    """(date, close) pairs from a chart response, nulls dropped."""
+    out: list[tuple[str, float]] = []
+    try:
+        stamps = result.get("timestamp") or []
+        closes = result["indicators"]["quote"][0]["close"]
+    except (KeyError, IndexError, TypeError):
+        return out
+    for ts, close in zip(stamps, closes):
+        if close is None:
+            continue
+        out.append((datetime.fromtimestamp(ts, timezone.utc).date().isoformat(), float(close)))
+    return out
+
+
+def series(symbol: str, rng: str = "1y", interval: str = "1d",
+           timeout: float = 20.0) -> list[tuple[str, float]]:
+    """Daily closes over an arbitrary range, for charting and backfill."""
+    with httpx.Client(headers=HEADERS, timeout=timeout, follow_redirects=True) as client:
+        r = client.get(CHART.format(symbol=symbol), params={"range": rng, "interval": interval})
+        r.raise_for_status()
+        return _closes(r.json()["chart"]["result"][0])
+
+
+def intraday(symbol: str, rng: str = "1d", interval: str = "5m",
+             timeout: float = 20.0) -> list[tuple[str, float]]:
+    """Timestamped closes for the intraday views, which have no daily rows."""
+    with httpx.Client(headers=HEADERS, timeout=timeout, follow_redirects=True) as client:
+        r = client.get(CHART.format(symbol=symbol), params={"range": rng, "interval": interval})
+        r.raise_for_status()
+        result = r.json()["chart"]["result"][0]
+    stamps = result.get("timestamp") or []
+    closes = result["indicators"]["quote"][0]["close"]
+    return [(datetime.fromtimestamp(t, timezone.utc).isoformat(timespec="minutes"), float(c))
+            for t, c in zip(stamps, closes) if c is not None]
+
+
+def fetch(symbols: list[str], timeout: float = 15.0
+          ) -> tuple[list[dict], list[str], dict[str, list[tuple[str, float]]]]:
+    """Return (observations, failed_symbols, daily_closes_by_symbol)."""
     out: list[dict] = []
     failed: list[str] = []
+    history_points: dict[str, list[tuple[str, float]]] = {}
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
 
     with httpx.Client(headers=HEADERS, timeout=timeout, follow_redirects=True) as client:
@@ -85,6 +124,7 @@ def fetch(symbols: list[str], timeout: float = 15.0) -> tuple[list[dict], list[s
                     continue
                 prev = _previous_close(result, meta)
                 ytd = _ytd_pct(result, price)
+                history_points[symbol] = _closes(result)
                 change = (price - prev) if prev is not None else None
                 out.append({
                     "kind": "symbol",
@@ -105,4 +145,4 @@ def fetch(symbols: list[str], timeout: float = 15.0) -> tuple[list[dict], list[s
                 failed.append(symbol)
             time.sleep(PAUSE_SECONDS)
 
-    return out, failed
+    return out, failed, history_points

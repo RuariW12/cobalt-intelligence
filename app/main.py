@@ -9,6 +9,7 @@ before the work behind it lands.
 from __future__ import annotations
 
 import os
+from datetime import date, timedelta
 from pathlib import Path
 
 import httpx
@@ -19,6 +20,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app import render
+from etl.sources.yahoo import intraday as yahoo_intraday
+from etl.sources.yahoo import series as yahoo_series
 from store import db
 from app.catalog import PAGES, SECTIONS
 
@@ -110,6 +113,76 @@ async def summarize(section: str = "home") -> JSONResponse:
         "summary": (body.get("response") or "").strip(),
         "tokens": body.get("eval_count"),
     })
+
+
+# --- history, for the charts -----------------------------------------------
+
+# Each view names the window it needs and how to backfill it if the store is
+# short. Intraday is fetched live and never stored: it is superseded within
+# minutes and would bloat a table built for daily closes.
+RANGES: dict[str, dict] = {
+    "1D":  {"intraday": ("1d", "5m")},
+    "1W":  {"days": 7,    "fetch": ("1mo", "1d")},
+    "1M":  {"days": 31,   "fetch": ("3mo", "1d")},
+    "YTD": {"ytd": True,  "fetch": ("ytd", "1d")},
+    "1Y":  {"days": 365,  "fetch": ("1y", "1d")},
+    "5Y":  {"days": 1826, "fetch": ("5y", "1d")},
+    "10Y": {"days": 3652, "fetch": ("10y", "1d")},
+}
+
+
+@app.get("/api/history")
+async def history(key: str, range: str = "YTD") -> JSONResponse:
+    spec = RANGES.get(range.upper())
+    if spec is None:
+        return JSONResponse(status_code=400, content={
+            "error": f"unknown range: {range}", "valid": list(RANGES)})
+
+    inst = db.instruments().get(key)
+
+    if "intraday" in spec:
+        rng, interval = spec["intraday"]
+        try:
+            points = await run_in_threadpool(yahoo_intraday, key, rng, interval)
+        except Exception as exc:
+            return JSONResponse(status_code=502, content={
+                "error": "intraday unavailable", "detail": str(exc)})
+        return JSONResponse(_series_payload(key, inst, range, points))
+
+    today = date.today()
+    since = (date(today.year, 1, 1) if spec.get("ytd")
+             else today - timedelta(days=spec["days"])).isoformat()
+
+    rows = await run_in_threadpool(db.history, key, since)
+    have_from = await run_in_threadpool(db.history_start, key)
+
+    # Backfill only when the store genuinely does not reach far enough back —
+    # a few days of slack absorbs weekends and holidays.
+    if have_from is None or (have_from > since
+                             and (date.fromisoformat(have_from) - date.fromisoformat(since)).days > 5):
+        rng, interval = spec["fetch"]
+        try:
+            fetched = await run_in_threadpool(yahoo_series, key, rng, interval)
+            await run_in_threadpool(db.write_history, key, fetched)
+            rows = await run_in_threadpool(db.history, key, since)
+        except Exception:
+            pass  # serve whatever is stored rather than failing the chart
+
+    points = [(r["as_of"], r["close"]) for r in rows]
+    return JSONResponse(_series_payload(key, inst, range, points))
+
+
+def _series_payload(key: str, inst, rng: str, points: list) -> dict:
+    first = points[0][1] if points else None
+    last = points[-1][1] if points else None
+    return {
+        "key": key,
+        "name": (inst["name"] if inst else key),
+        "unit": (inst["unit"] if inst else None),
+        "range": rng.upper(),
+        "points": points,
+        "change_pct": ((last / first - 1) * 100) if first and last else None,
+    }
 
 
 # --- assets ----------------------------------------------------------------

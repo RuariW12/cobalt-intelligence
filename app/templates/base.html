@@ -13,6 +13,9 @@
 {%- endif %}
 <script src="/scripts/theme.js"></script>
 <script src="/scripts/main.js" defer></script>
+{%- if page.has_chart %}
+<script src="/scripts/chart.js" defer></script>
+{%- endif %}
 </head>
 <body data-section="{{ page.section }}">
 

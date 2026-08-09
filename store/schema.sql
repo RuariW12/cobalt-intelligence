@@ -43,6 +43,19 @@ CREATE TABLE IF NOT EXISTS observation (
 
 CREATE INDEX IF NOT EXISTS observation_recent ON observation (kind, key, as_of DESC);
 
+-- Daily closes, for charting. Separate from `observation` because it is a
+-- dense series with one job, not a snapshot with change/percent/quality
+-- attached. Populated free of charge: the quote fetch already returns a
+-- year of closes, and longer ranges backfill on demand.
+CREATE TABLE IF NOT EXISTS history (
+    key     TEXT NOT NULL,
+    as_of   TEXT NOT NULL,          -- DATE
+    close   REAL NOT NULL,
+    PRIMARY KEY (key, as_of)
+);
+
+CREATE INDEX IF NOT EXISTS history_range ON history (key, as_of);
+
 CREATE TABLE IF NOT EXISTS tag (
     key         TEXT NOT NULL,
     tag         TEXT NOT NULL,

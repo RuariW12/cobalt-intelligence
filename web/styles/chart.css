@@ -1,0 +1,133 @@
+/* charts — same grammar as the tables: mono figures, hairline rules, one
+   accent. The SVG reads its colours from the tokens at draw time, so the
+   day/night toggle carries through without a second palette. */
+
+.chart {
+  margin: 4px 0 0 0;
+}
+
+.chart-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-bottom: 8px;
+}
+
+.chart-range,
+.chart-pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.chart-range button,
+.chart-pick button {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  background: none;
+  border: 1px solid transparent;
+  color: var(--muted);
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.chart-range button:hover,
+.chart-pick button:hover {
+  color: var(--text);
+}
+
+/* the selected view, marked by a rule rather than a fill — a filled button
+   would be the loudest thing on an otherwise flat page */
+.chart-range button.on,
+.chart-pick button.on {
+  color: var(--text);
+  border-color: var(--rule);
+}
+
+.chart-range button:focus-visible,
+.chart-pick button:focus-visible {
+  outline: 1px solid var(--blue);
+  outline-offset: 1px;
+}
+
+/* The value line. Reserved height and a baseline-aligned row mean swapping
+   between the resting summary and a hovered point never shifts the layout. */
+
+.chart-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 1.5em;
+  margin-bottom: 4px;
+}
+
+.chart-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chart-readout {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  white-space: pre;
+  text-align: right;
+}
+
+/* while the crosshair is up the readout is a fact about one point, not a
+   verdict about the window, so it drops the up/down colour */
+.chart-readout.hovering {
+  color: var(--text);
+}
+
+.chart-frame {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 4px 0;
+}
+
+.chart-foot {
+  margin-top: 5px;
+}
+
+.chart-span {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-style: normal;
+}
+
+.chart-svg {
+  display: block;
+  width: 100%;
+  height: 220px;
+  touch-action: none;
+}
+
+.chart-axis {
+  font-family: var(--mono);
+  font-size: 11px;
+  fill: var(--muted);
+}
+
+.chart-empty {
+  font-family: inherit;
+  font-size: 15px;
+  font-style: italic;
+  fill: var(--muted);
+}
+
+/* rows are clickable when a chart on the page can show them */
+.quotes tr[data-symbol] {
+  cursor: pointer;
+}
+
+.quotes tr[data-symbol]:hover td:first-child {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

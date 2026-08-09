@@ -120,6 +120,34 @@ def latest() -> dict[tuple[str, str], sqlite3.Row]:
         return {(r["kind"], r["key"]): r for r in cur.fetchall()}
 
 
+def write_history(key: str, points: list[tuple[str, float]]) -> int:
+    if not points:
+        return 0
+    with connect() as conn:
+        conn.executemany(
+            "INSERT INTO history (key, as_of, close) VALUES (?,?,?) "
+            "ON CONFLICT(key, as_of) DO UPDATE SET close=excluded.close",
+            [(key, d, c) for d, c in points])
+    return len(points)
+
+
+def history(key: str, since: str | None = None) -> list[sqlite3.Row]:
+    sql = "SELECT as_of, close FROM history WHERE key = ?"
+    args: list = [key]
+    if since:
+        sql += " AND as_of >= ?"
+        args.append(since)
+    sql += " ORDER BY as_of"
+    with connect() as conn:
+        return conn.execute(sql, args).fetchall()
+
+
+def history_start(key: str) -> str | None:
+    with connect() as conn:
+        row = conn.execute("SELECT MIN(as_of) AS d FROM history WHERE key=?", (key,)).fetchone()
+        return row["d"] if row and row["d"] else None
+
+
 # --- documents -------------------------------------------------------------
 
 def write_documents(rows: Iterable[dict]) -> int:
