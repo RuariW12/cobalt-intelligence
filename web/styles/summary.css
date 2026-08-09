@@ -90,7 +90,9 @@
 
 /* Summaries arrive as separate paragraphs. Spacing rather than bullets: these
    are connected observations that read in order, not a list of unrelated
-   items, so they should look like prose with room to breathe. */
+   items, so they should look like prose with room to breathe. Every paragraph
+   is the same weight — greying the later ones implied they mattered less, when
+   the model has no such ordering in mind. */
 
 .summary-line {
   margin: 0 0 10px 0;
@@ -100,11 +102,3 @@
   margin-bottom: 0;
 }
 
-/* the first line carries the headline finding, so let it lead */
-.summary-line:first-child {
-  color: var(--text);
-}
-
-.summary-line ~ .summary-line {
-  color: var(--muted);
-}
