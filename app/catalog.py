@@ -126,9 +126,8 @@ PAGES = {'': {'title': 'cobalt',
                                                         'licensed',
                                               'derived': 'ndx-trailing-pe'}]},
                                    {'type': 'note',
-                                    'text': 'Empty &mdash; no ingest has run yet. Concentration is '
-                                            'the single most direct bubble read: how much of the '
-                                            'index is one trade.'},
+                                    'text': 'Concentration is the single most direct bubble read: '
+                                            'how much of the index is one trade.'},
                                    {'type': 'quotes',
                                     'heading': 'chips &amp; equipment',
                                     'columns': ['Company',
@@ -263,9 +262,34 @@ PAGES = {'': {'title': 'cobalt',
                                             'symbol': 'BTC-USD',
                                             'unit': 'BTC / USD'}]},
                                  {'type': 'note',
-                                  'text': 'Empty &mdash; no ingest has run yet. Bitcoin trades '
-                                          '24/7, so the change column is a rolling 24 hours, not a '
-                                          'session close like the equity pages.'},
+                                  'text': 'Bitcoin trades 24/7, so the change column is a rolling '
+                                          '24 hours, not a session close like the equity pages.'},
+                                 {'type': 'quotes',
+                                  'heading': 'strategy',
+                                  'columns': ['Instrument',
+                                              'Ticker',
+                                              'Price',
+                                              'Change',
+                                              '%',
+                                              'YTD'],
+                                  'source': 'yahoo',
+                                  'rows': [{'name': 'Strategy',
+                                            'symbol': 'MSTR',
+                                            'unit': 'common stock',
+                                            'ticker': 'MSTR'},
+                                           {'name': 'Strategy',
+                                            'symbol': 'STRC',
+                                            'unit': 'variable-rate preferred',
+                                            'ticker': 'STRC'}]},
+                                 {'type': 'note',
+                                  'text': 'Strategy holds bitcoin on its balance sheet, so the '
+                                          'common trades as a leveraged proxy for the coin &mdash; '
+                                          'it moves further than bitcoin in both directions. The '
+                                          'preferred is the other half of that story: it is how '
+                                          'the treasury is financed, so its price says what the '
+                                          'market charges Strategy to keep buying. The two '
+                                          'diverging is the signal worth watching, and neither is '
+                                          'visible from the coin price alone.'},
                                  {'type': 'stories',
                                   'heading': 'related headlines',
                                   'items': [{}, {}, {}, {}]}]},
@@ -323,9 +347,8 @@ PAGES = {'': {'title': 'cobalt',
                                                 'period': 'USD / bbl',
                                                 'derived': 'brent-wti-spread'}]},
                                      {'type': 'note',
-                                      'text': 'Empty &mdash; no ingest has run yet. Aluminum '
-                                              'trades thinly and its quote can lag the others by a '
-                                              'session.'},
+                                      'text': 'Aluminum trades thinly and its quote can lag the '
+                                              'others by a session.'},
                                      {'type': 'links',
                                       'heading': 'not priced here',
                                       'items': [{'text': 'tungsten, uranium, lithium, cobalt, iron '
@@ -369,8 +392,7 @@ PAGES = {'': {'title': 'cobalt',
                                                        'symbol': 'MCD',
                                                        'ticker': 'MCD'}]},
                                             {'type': 'note',
-                                             'text': 'Empty &mdash; no ingest has run yet. Source '
-                                                     'and quote time appear here.'},
+                                             'text': 'Source and quote time appear here.'},
                                             {'type': 'stories',
                                              'heading': 'related headlines',
                                              'items': [{}, {}]}]},
@@ -417,11 +439,10 @@ PAGES = {'': {'title': 'cobalt',
                                                      'unit': 'SAR &middot; Tadawul',
                                                      'ticker': '2222.SR'}]},
                                           {'type': 'note',
-                                           'text': 'Empty &mdash; no ingest has run yet. Aramco '
-                                                   'has no US listing &mdash; it prices in riyals '
-                                                   'on the Tadawul, which runs Sunday to Thursday, '
-                                                   'so its week does not line up with the US '
-                                                   'majors above.'},
+                                           'text': 'Aramco has no US listing &mdash; it prices in '
+                                                   'riyals on the Tadawul, which runs Sunday to '
+                                                   'Thursday, so its week does not line up with '
+                                                   'the US majors above.'},
                                           {'type': 'stories',
                                            'heading': 'related headlines',
                                            'items': [{}, {}]}]},
@@ -461,8 +482,7 @@ PAGES = {'': {'title': 'cobalt',
                                                          'unit': 'class B',
                                                          'ticker': 'BRK-B'}]},
                                               {'type': 'note',
-                                               'text': 'Empty &mdash; no ingest has run yet. '
-                                                       'Berkshire is tracked on the class B share; '
+                                               'text': 'Berkshire is tracked on the class B share; '
                                                        'class A (BRK-A) is the same company at '
                                                        'roughly 1,500&times; the price per share.'},
                                               {'type': 'stories',
@@ -541,8 +561,7 @@ PAGES = {'': {'title': 'cobalt',
                                                          'unit': 'ADR',
                                                          'ticker': 'SIEGY'}]},
                                               {'type': 'note',
-                                               'text': 'Empty &mdash; no ingest has run yet. '
-                                                       'Siemens is quoted as the US ADR; the '
+                                               'text': 'Siemens is quoted as the US ADR; the '
                                                        'primary listing is SIE.DE on XETRA in '
                                                        'euros.'},
                                               {'type': 'stories',
@@ -600,10 +619,10 @@ PAGES = {'': {'title': 'cobalt',
                                                    'unit': 'ADR',
                                                    'ticker': 'ASML'}]},
                                         {'type': 'note',
-                                         'text': 'Empty &mdash; no ingest has run yet. TSMC and '
-                                                 'ASML are quoted here as US-listed ADRs, so they '
-                                                 'price in USD on US hours &mdash; their home '
-                                                 'listings in Taipei and Amsterdam move first.'},
+                                         'text': 'TSMC and ASML are quoted here as US-listed ADRs, '
+                                                 'so they price in USD on US hours &mdash; their '
+                                                 'home listings in Taipei and Amsterdam move '
+                                                 'first.'},
                                         {'type': 'stories',
                                          'heading': 'related headlines',
                                          'items': [{}, {}]}]},
@@ -648,10 +667,9 @@ PAGES = {'': {'title': 'cobalt',
                                                'period': 'large-cap tech vs small caps, YTD',
                                                'derived': 'qqq-iwm-ytd'}]},
                                     {'type': 'note',
-                                     'text': 'Empty &mdash; no ingest has run yet. VTI and VOO '
-                                             'overlap heavily &mdash; the S&amp;P 500 is most of '
-                                             'the US market by weight &mdash; so a gap between '
-                                             'them is a small-cap signal.'},
+                                     'text': 'VTI and VOO overlap heavily &mdash; the S&amp;P 500 '
+                                             'is most of the US market by weight &mdash; so a gap '
+                                             'between them is a small-cap signal.'},
                                     {'type': 'stories',
                                      'heading': 'related headlines',
                                      'items': [{}, {}]}]},
@@ -710,9 +728,8 @@ PAGES = {'': {'title': 'cobalt',
                                                        'unit': 'iShares',
                                                        'ticker': 'EEM'}]},
                                             {'type': 'note',
-                                             'text': 'Empty &mdash; no ingest has run yet. Both '
-                                                     'hold assets priced in other currencies but '
-                                                     'trade in USD, so their moves blend local '
+                                             'text': 'Both hold assets priced in other currencies '
+                                                     'but trade in USD, so their moves blend local '
                                                      'performance with the dollar &mdash; a strong '
                                                      'dollar drags returns even when the '
                                                      'underlying markets rise.'},
@@ -778,8 +795,7 @@ PAGES = {'': {'title': 'cobalt',
                                                    'symbol': 'URA',
                                                    'ticker': 'URA'}]},
                                         {'type': 'note',
-                                         'text': 'Empty &mdash; no ingest has run yet. The split '
-                                                 'matters when these stand in for <a '
+                                         'text': 'The split matters when these stand in for <a '
                                                  'href="/sections/commodities">spot prices</a>: '
                                                  'the physically backed trusts track metal almost '
                                                  'one-for-one, while the miner baskets carry '
@@ -861,8 +877,7 @@ PAGES = {'': {'title': 'cobalt',
                                                           'region': 'Europe',
                                                           'session': True}]},
                                                {'type': 'note',
-                                                'text': 'Empty &mdash; no ingest has run yet. '
-                                                        'These markets close before US hours, so '
+                                                'text': 'These markets close before US hours, so '
                                                         'most quotes will be a prior close &mdash; '
                                                         'the dot and &ldquo;as of&rdquo; column '
                                                         'say which.'},
@@ -894,8 +909,7 @@ PAGES = {'': {'title': 'cobalt',
                                                'symbol': '^DJI',
                                                'session': True}]},
                                     {'type': 'note',
-                                     'text': 'Empty &mdash; no ingest has run yet. Dot shows '
-                                             'whether the market was open at refresh.'},
+                                     'text': 'Dot shows whether the market was open at refresh.'},
                                     {'type': 'stories',
                                      'heading': 'related headlines',
                                      'items': [{}, {}]}]},
@@ -927,10 +941,9 @@ PAGES = {'': {'title': 'cobalt',
                                                  'period': 'annualized',
                                                  'series': 'HOUST'}]},
                                       {'type': 'note',
-                                       'text': 'Empty &mdash; no ingest has run yet. No survey '
-                                               'data: ISM PMI is licensed and has no free feed, so '
-                                               'growth here is read from hard data only, which '
-                                               'lags.'},
+                                       'text': 'No survey data: ISM PMI is licensed and has no '
+                                               'free feed, so growth here is read from hard data '
+                                               'only, which lags.'},
                                       {'type': 'stories',
                                        'heading': 'related headlines',
                                        'items': [{}, {}]}]},
@@ -990,8 +1003,7 @@ PAGES = {'': {'title': 'cobalt',
                                                     'period': 'year over year',
                                                     'series': 'PPIFIS'}]},
                                          {'type': 'note',
-                                          'text': 'Empty &mdash; no ingest has run yet. Source and '
-                                                  'release date appear here.'},
+                                          'text': 'Source and release date appear here.'},
                                          {'type': 'stories',
                                           'heading': 'related headlines',
                                           'items': [{}, {}]}]},
@@ -1022,8 +1034,7 @@ PAGES = {'': {'title': 'cobalt',
                                                 'period': 'year over year',
                                                 'series': 'CES0500000003'}]},
                                      {'type': 'note',
-                                      'text': 'Empty &mdash; no ingest has run yet. Source and '
-                                              'release date appear here.'},
+                                      'text': 'Source and release date appear here.'},
                                      {'type': 'stories',
                                       'heading': 'related headlines',
                                       'items': [{}, {}]}]},
@@ -1042,10 +1053,7 @@ PAGES = {'': {'title': 'cobalt',
                              'summary_body': 'No summary yet. Refresh the data, then ask for one.',
                              'panels': [{'type': 'stories',
                                          'heading': 'headlines',
-                                         'items': [{}, {}, {}, {}]},
-                                        {'type': 'note',
-                                         'style': 'meta',
-                                         'text': 'Empty &mdash; no ingest has run yet.'}]},
+                                         'items': [{}, {}, {}, {}]}]},
  'sections/news': {'title': 'news',
                    'h1': 'News',
                    'section': 'news',
@@ -1066,10 +1074,7 @@ PAGES = {'': {'title': 'cobalt',
                                'heading': 'latest headlines',
                                'items': [{'tag': 'politics', 'tag_class': 'tag-politics'},
                                          {'tag': 'economics', 'tag_class': 'tag-economics'},
-                                         {'tag': 'tech', 'tag_class': 'tag-tech'}]},
-                              {'type': 'note',
-                               'style': 'meta',
-                               'text': 'Empty &mdash; no ingest has run yet.'}]},
+                                         {'tag': 'tech', 'tag_class': 'tag-tech'}]}]},
  'sections/news/politics': {'title': 'politics',
                             'h1': 'Politics',
                             'accent': 'clay',
@@ -1085,10 +1090,7 @@ PAGES = {'': {'title': 'cobalt',
                             'summary_body': 'No summary yet. Refresh the data, then ask for one.',
                             'panels': [{'type': 'stories',
                                         'heading': 'headlines',
-                                        'items': [{}, {}, {}, {}]},
-                                       {'type': 'note',
-                                        'style': 'meta',
-                                        'text': 'Empty &mdash; no ingest has run yet.'}]},
+                                        'items': [{}, {}, {}, {}]}]},
  'sections/news/tech': {'title': 'technology &amp; science',
                         'h1': 'Technology &amp; Science',
                         'accent': 'violet',
@@ -1104,10 +1106,7 @@ PAGES = {'': {'title': 'cobalt',
                         'summary_body': 'No summary yet. Refresh the data, then ask for one.',
                         'panels': [{'type': 'stories',
                                     'heading': 'headlines',
-                                    'items': [{}, {}, {}, {}]},
-                                   {'type': 'note',
-                                    'style': 'meta',
-                                    'text': 'Empty &mdash; no ingest has run yet.'}]},
+                                    'items': [{}, {}, {}, {}]}]},
  'sections/rates/credit': {'title': 'credit spreads',
                            'h1': 'Credit Spreads',
                            'accent': 'green',
@@ -1131,9 +1130,8 @@ PAGES = {'': {'title': 'cobalt',
                                                  'period': 'option-adjusted, bps',
                                                  'series': 'BAMLH0A0HYM2'}]},
                                       {'type': 'note',
-                                       'text': 'Empty &mdash; no ingest has run yet. Source and '
-                                               'release date appear here. Widening spreads signal '
-                                               'tightening credit conditions.'},
+                                       'text': 'Source and release date appear here. Widening '
+                                               'spreads signal tightening credit conditions.'},
                                       {'type': 'stories',
                                        'heading': 'related headlines',
                                        'items': [{}, {}]}]},
@@ -1192,8 +1190,7 @@ PAGES = {'': {'title': 'cobalt',
                                                      'period': 'negative = inverted',
                                                      'series': 'T10Y2Y'}]},
                                           {'type': 'note',
-                                           'text': 'Empty &mdash; no ingest has run yet. Source '
-                                                   'and release date appear here.'},
+                                           'text': 'Source and release date appear here.'},
                                           {'type': 'stories',
                                            'heading': 'related headlines',
                                            'items': [{}, {}]}]}}

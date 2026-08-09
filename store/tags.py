@@ -54,6 +54,10 @@ THEMES: dict[str, tuple[str, ...]] = {
     "HOUST": ("growth", "housing", "rate-sensitive", "leading-indicator"),
     # crypto
     "BTC-USD": ("crypto", "risk-appetite", "liquidity-proxy"),
+    # Strategy: the common is a leveraged bitcoin proxy, the preferred is the
+    # funding line behind it. Tagged so a bitcoin query pulls both.
+    "MSTR": ("crypto", "bitcoin-proxy", "treasury-company", "leverage"),
+    "STRC": ("crypto", "bitcoin-proxy", "treasury-company", "funding-cost"),
 }
 
 # Whole groups that share meaning, matched after the exact table above.
