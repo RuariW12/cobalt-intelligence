@@ -20,6 +20,10 @@ if [ -f .env ]; then
 fi
 
 FILES=(-f docker/compose.yml)
+# Compose reads .env from the project directory, which defaults to the
+# compose file's directory — docker/ — not the repo root. Without this the
+# .env you actually edit is silently ignored.
+[ -f .env ] && FILES=(--env-file .env "${FILES[@]}")
 LLM=0
 CONTAINER_OLLAMA=0
 OLLAMA_HOST_URL="http://127.0.0.1:11434"

@@ -14,9 +14,11 @@ import argparse
 import sys
 from datetime import datetime, timezone
 
-from app import db
 from app.catalog import PAGES, SECTIONS
 from etl.sources import fred, yahoo
+from store import clean, db, documents
+from store import tags as tagging
+from store.catalog_sync import sync as sync_instruments
 
 # Series computed from other observations rather than fetched.
 DERIVED = {
@@ -62,24 +64,51 @@ def compute_derived(now: str) -> list[dict]:
     return out
 
 
+def store_rows(raw: list[dict], insts: dict) -> tuple[int, int, int]:
+    """Clean, persist, and turn into retrievable documents.
+
+    Returns (written, suspect, documents). Cleaning happens here rather than in
+    each source so every source gets the same guarantees.
+    """
+    cleaned, docs = [], []
+    suspect = 0
+    for row in raw:
+        inst = insts.get(row["key"])
+        obs = clean.observation(row, inst["asset_class"] if inst else "")
+        if obs is None:
+            continue
+        if obs["quality"] == "suspect":
+            suspect += 1
+        cleaned.append(obs)
+        if inst:
+            docs.append(documents.build(dict(inst), obs, db.tags_for(row["key"])))
+
+    written = db.write_observations(cleaned)
+    db.write_documents(docs)
+    return written, suspect, len(docs)
+
+
 def ingest(section: str = "all") -> dict:
     db.init()
+    sync_instruments()
+    insts = db.instruments()
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     symbols, series = targets(section)
 
-    result = {"section": section, "written": 0, "failed": [], "sources": {}}
+    result = {"section": section, "written": 0, "documents": 0, "failed": [], "sources": {}}
 
     if symbols:
         run_id = db.start_run(section, "yahoo", now)
         rows, failed = yahoo.fetch(symbols)
-        written = db.write_observations(rows)
+        written, suspect, docs = store_rows(rows, insts)
         db.finish_run(run_id, datetime.now(timezone.utc).isoformat(timespec="seconds"),
                       "ok" if not failed else "partial", written,
                       f"{len(failed)} failed" if failed else None)
         result["written"] += written
+        result["documents"] += docs
         result["failed"] += failed
         result["sources"]["yahoo"] = {"requested": len(symbols), "written": written,
-                                      "failed": len(failed)}
+                                      "failed": len(failed), "suspect": suspect}
 
     if series:
         if not fred.available():
@@ -88,19 +117,22 @@ def ingest(section: str = "all") -> dict:
         else:
             run_id = db.start_run(section, "fred", now)
             rows, failed = fred.fetch(series)
-            written = db.write_observations(rows)
+            written, suspect, docs = store_rows(rows, insts)
             db.finish_run(run_id, datetime.now(timezone.utc).isoformat(timespec="seconds"),
                           "ok" if not failed else "partial", written,
                           f"{len(failed)} failed" if failed else None)
             result["written"] += written
+            result["documents"] += docs
             result["failed"] += failed
             result["sources"]["fred"] = {"requested": len(series), "written": written,
-                                         "failed": len(failed)}
+                                         "failed": len(failed), "suspect": suspect}
 
     derived = compute_derived(datetime.now(timezone.utc).isoformat(timespec="seconds"))
     if derived:
-        result["written"] += db.write_observations(derived)
-        result["sources"]["derived"] = {"written": len(derived)}
+        written, _, docs = store_rows(derived, insts)
+        result["written"] += written
+        result["documents"] += docs
+        result["sources"]["derived"] = {"written": written}
 
     return result
 
@@ -111,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     r = ingest(args.section)
-    print(f"section={r['section']} written={r['written']}")
+    print(f"section={r['section']} written={r['written']} documents={r['documents']}")
     for name, info in r["sources"].items():
         print(f"  {name}: {info}")
     if r["failed"]:

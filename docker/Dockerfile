@@ -22,6 +22,7 @@ COPY requirements.lock ./
 RUN pip install --no-cache-dir -r requirements.lock
 
 COPY app/ app/
+COPY store/ store/
 COPY etl/ etl/
 COPY web/ web/
 

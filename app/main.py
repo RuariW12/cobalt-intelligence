@@ -18,7 +18,8 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app import db, render
+from app import render
+from store import db
 from app.catalog import PAGES, SECTIONS
 
 BASE_DIR = Path(__file__).resolve().parent

@@ -8,9 +8,9 @@ un-ingested page looks deliberately empty rather than broken.
 from __future__ import annotations
 
 import copy
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from app import db
+from store import db
 from app.catalog import PAGES
 
 # Which stored field a table column wants. Anything unmapped (YTD, Mkt cap,
@@ -111,32 +111,28 @@ def _humanise(iso: str) -> str:
     return t.strftime("%Y-%m-%d %H:%M UTC")
 
 
-def digest(section: str) -> str:
-    """Plain-text view of a section's current data, for the model."""
-    latest = db.latest()
-    lines: list[str] = []
-    for slug, page in PAGES.items():
-        if page["section"] != section and section not in ("home", "all"):
-            continue
-        rows_out: list[str] = []
-        for panel in page["panels"]:
-            for row in panel.get("rows", []):
-                key = (("symbol", row["symbol"]) if row.get("symbol")
-                       else ("series", row["series"]) if row.get("series")
-                       else ("derived", row["derived"]) if row.get("derived")
-                       else None)
-                obs = latest.get(key) if key else None
-                if not obs:
-                    continue
-                bits = [f"{row['name']}: {_num(obs['value'])}"]
-                if obs["change"] is not None:
-                    bits.append(f"change {obs['change']:+,.2f}")
-                if obs["pct"] is not None:
-                    bits.append(f"({obs['pct']:+.2f}%)")
-                if row.get("unit"):
-                    bits.append(f"[{row['unit']}]")
-                rows_out.append("  " + " ".join(bits))
-        if rows_out:
-            lines.append(f"{page['h1']}:")
-            lines.extend(rows_out)
-    return "\n".join(lines) if lines else "(no data has been ingested yet)"
+def digest(section: str, days: int = 400, limit: int = 120) -> str:
+    """What the model reads: retrieved documents, not a re-derived table.
+
+    Each document is already a dated, tagged sentence, so retrieval is a
+    metadata filter rather than a formatting job — and the same rows will feed
+    an embedding index later without being rebuilt.
+    """
+    # A wide floor, not a window: this only excludes series that have stopped
+    # updating entirely. Recency per instrument is handled by latest_only.
+    since = (datetime.now(timezone.utc).date() - timedelta(days=days)).isoformat()
+    rows = db.search_documents(section=section, since=since, limit=limit,
+                               latest_only=True)
+    if not rows:
+        return "(no data has been ingested yet)"
+
+    by_section: dict[str, list[str]] = {}
+    for r in rows:
+        by_section.setdefault(r["section"] or "other", []).append(r["body"])
+
+    out: list[str] = []
+    for name, bodies in by_section.items():
+        out.append(f"## {name}")
+        out.extend(bodies)
+        out.append("")
+    return "\n".join(out).strip()

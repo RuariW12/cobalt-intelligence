@@ -25,6 +25,10 @@ docker info >/dev/null 2>&1 || { echo "docker daemon is not running" >&2; exit 1
 # Include every overlay: `down` only removes what the merged config declares,
 # so a stack started with --vpn or --gpu must be torn down the same way.
 FILES=(-f docker/compose.yml -f docker/compose.gpu.yml -f docker/compose.vpn.yml)
+# Compose reads .env from the project directory, which defaults to the
+# compose file's directory — docker/ — not the repo root. Without this the
+# .env you actually edit is silently ignored.
+[ -f .env ] && FILES=(--env-file .env "${FILES[@]}")
 PROFILES=(--profile llm --profile tools)
 
 if [ "$WIPE" -eq 1 ]; then
