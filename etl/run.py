@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 from datetime import datetime, timezone
 
 from app.catalog import PAGES, SECTIONS
@@ -225,6 +226,33 @@ def ingest(section: str = "all") -> dict:
     return result
 
 
+def backfill_prices(rng: str = "10y") -> dict:
+    """Pull a long price history for every tracked symbol.
+
+    Charts backfill on demand, so depth ends up uneven — ten years for whatever
+    you happened to open, one year for the rest. The archive should not have
+    that shape, so this levels it in one pass.
+    """
+    db.init()
+    symbols, _ = targets("all")
+    started = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    run_id = db.start_run("all", "yahoo-backfill", started)
+
+    written, failed = 0, []
+    for symbol in symbols:
+        try:
+            points = yahoo.series(symbol, rng, "1d")
+            written += db.write_history(symbol, points)
+        except Exception:
+            failed.append(symbol)
+        time.sleep(yahoo.PAUSE_SECONDS)
+
+    db.finish_run(run_id, datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                  "ok" if not failed else "partial", written,
+                  ", ".join(failed) or None)
+    return {"symbols": len(symbols), "written": written, "failed": failed}
+
+
 def backfill(since: str | None = None) -> dict:
     """Load every FRED series to inception.
 
@@ -308,6 +336,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.backfill:
+        p = backfill_prices()
+        print(f"backfilled {p['written']} daily closes across {p['symbols']} symbols"
+              + (f" ({len(p['failed'])} failed)" if p["failed"] else ""))
         r = backfill(args.since)
         if "error" in r:
             print(r["error"], file=sys.stderr)

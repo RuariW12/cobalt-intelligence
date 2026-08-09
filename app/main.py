@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import os
 from datetime import date, timedelta
+from urllib.parse import quote_plus
 from pathlib import Path
 
 import httpx
@@ -241,6 +242,67 @@ class RevalidatingStatic(StaticFiles):
 
 app.mount("/styles", RevalidatingStatic(directory=WEB_ROOT / "styles"), name="styles")
 app.mount("/scripts", RevalidatingStatic(directory=WEB_ROOT / "scripts"), name="scripts")
+
+
+# --- archive ---------------------------------------------------------------
+# Declared before the catch-all /sections/{path} below, which would otherwise
+# swallow it and 404.
+
+PER_PAGE = 100
+
+
+def _fmt(v, suffix=""):
+    if v is None:
+        return "&mdash;", None
+    a = abs(v)
+    digits = 0 if a >= 10000 else 2
+    cls = "up" if v > 0 else "down" if v < 0 else None
+    return f"{v:+,.{digits}f}{suffix}", cls
+
+
+@app.get("/sections/archive", response_class=HTMLResponse)
+def archive(request: Request, q: str = "", key: str = "", offset: int = 0) -> HTMLResponse:
+    """Everything the store has kept: browse by section, or search across it."""
+    offset = max(0, offset)
+    ctx = {"q": q, "offset": offset, "per_page": PER_PAGE, "total": 0,
+           "stats": db.store_stats(), "instrument": None, "sections": {},
+           "instruments": [], "articles": [], "article_total": 0, "tags": [],
+           "rows": [], "title": "archive", "heading": "Archive",
+           "base_url": "/sections/archive?"}
+
+    if key:
+        inst = db.instruments().get(key)
+        if inst is None:
+            return HTMLResponse("<h1>404</h1><p>Nothing tracked under that key.</p>",
+                                status_code=404)
+        rows, total = db.entries(key, inst["kind"], PER_PAGE, offset)
+        for r in rows:
+            r["value_text"] = render.format_value(r["value"])
+            r["change_text"], r["change_cls"] = _fmt(r["change"])
+            r["pct_text"], r["pct_cls"] = _fmt(r["pct"], "%")
+        articles, _ = db.find_articles(key=key, limit=8)
+        ctx.update(instrument=inst, rows=rows, total=total,
+                   tags=db.tags_for(key),
+                   articles=[_article(a) for a in articles],
+                   title=inst["name"], heading=inst["name"],
+                   base_url=f"/sections/archive?key={quote_plus(key)}&")
+    elif q:
+        articles, article_total = db.find_articles(q=q, limit=PER_PAGE, offset=offset)
+        ctx.update(instruments=db.find_instruments(q),
+                   articles=[_article(a) for a in articles],
+                   article_total=article_total, total=article_total,
+                   title=f"search: {q}", heading=f"&ldquo;{q}&rdquo;",
+                   base_url=f"/sections/archive?q={quote_plus(q)}&")
+    else:
+        ctx["sections"] = db.sections_with_instruments()
+
+    return templates.TemplateResponse(request, "archive.html", {**ctx, **_assets()})
+
+
+def _article(a) -> dict:
+    when = a["published_at"] or a["fetched_at"]
+    return {"title": a["title"], "url": a["url"], "publisher": a["publisher"],
+            "section": a["section"], "when": render.humanise(when) if when else ""}
 
 
 # --- pages -----------------------------------------------------------------

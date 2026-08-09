@@ -50,7 +50,7 @@ def _tracked_tags(pages) -> set[str]:
     return wanted
 
 
-def _num(v: float | None) -> str:
+def format_value(v: float | None) -> str:
     if v is None:
         return DASH
     a = abs(v)
@@ -70,7 +70,7 @@ def _cell(field: str, obs) -> tuple[str, str | None]:
     if obs is None:
         return DASH, None
     if field == "value":
-        return _num(obs["value"]), None
+        return format_value(obs["value"]), None
     if field == "change":
         return _signed(obs["change"])
     if field == "pct":
@@ -124,7 +124,7 @@ def _headlines(slug: str, page: dict, limit: int) -> list[dict]:
         when = r["published_at"] or r["fetched_at"]
         out.append({
             "title": r["title"], "url": r["url"], "publisher": r["publisher"],
-            "when": _humanise(when) if when else "",
+            "when": humanise(when) if when else "",
             "section": r["section"],
         })
     return out
@@ -150,7 +150,7 @@ def build(slug: str) -> dict | None:
     page = copy.deepcopy(page)
     latest = db.latest()
     stamp = db.last_refresh()
-    page["refreshed"] = _humanise(stamp) if stamp else "never"
+    page["refreshed"] = humanise(stamp) if stamp else "never"
 
     for panel in page["panels"]:
         if panel["type"] == "stories":
@@ -180,7 +180,7 @@ def build(slug: str) -> dict | None:
                     obs = latest.get(("derived", row["derived"]))
                 else:
                     obs = None
-                row["value_text"] = _num(obs["value"]) if obs else DASH
+                row["value_text"] = format_value(obs["value"]) if obs else DASH
                 row["change_text"], row["change_cls"] = (
                     _signed(obs["change"]) if obs else (DASH, None))
                 row["has_data"] = obs is not None
@@ -189,7 +189,7 @@ def build(slug: str) -> dict | None:
     return page
 
 
-def _humanise(iso: str) -> str:
+def humanise(iso: str) -> str:
     try:
         t = datetime.fromisoformat(iso)
         if t.tzinfo is None:

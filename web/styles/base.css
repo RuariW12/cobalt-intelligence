@@ -293,3 +293,76 @@ strong {
   line-height: 1.5;
   max-width: 68ch;
 }
+
+/* archive — the stored-data browser */
+
+.archive-search {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 6px;
+}
+
+.archive-search input {
+  flex: 1;
+  font: inherit;
+  font-size: 16px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  color: var(--text);
+  padding: 6px 2px;
+}
+
+.archive-search input::placeholder {
+  color: var(--skeleton);
+  font-style: italic;
+}
+
+.archive-search input:focus {
+  outline: none;
+  border-bottom-color: var(--blue);
+}
+
+.archive-search button {
+  font: inherit;
+  font-size: 15px;
+  background: none;
+  border: 1px solid var(--rule);
+  color: var(--text);
+  padding: 4px 13px;
+  cursor: pointer;
+}
+
+.archive-search button:hover {
+  border-color: var(--text);
+}
+
+/* two columns of instruments where there is room; one on a narrow window */
+.archive-list {
+  columns: 2;
+  column-gap: 32px;
+}
+
+.archive-list li {
+  break-inside: avoid;
+  margin: 4px 0;
+}
+
+@media (max-width: 620px) {
+  .archive-list { columns: 1; }
+}
+
+.pager {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+/* an instrument we track but cannot fill: shown, not hidden, and not a link
+   to an empty table */
+.empty-instrument {
+  color: var(--skeleton);
+}

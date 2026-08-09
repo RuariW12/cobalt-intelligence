@@ -257,6 +257,109 @@ def search_documents(section: str | None = None, tags: list[str] | None = None,
         return conn.execute(" ".join(sql), args).fetchall()
 
 
+# --- archive ---------------------------------------------------------------
+
+def sections_with_instruments() -> dict[str, list[dict]]:
+    """Everything tracked, grouped the way the site is, with entry counts.
+
+    The count matters: a row with no data looks identical to one with ten years
+    of it until you click. Two aggregates beat one query per instrument.
+    """
+    with connect() as conn:
+        counts: dict[str, int] = {}
+        for table in ("observation", "history"):
+            for r in conn.execute(f"SELECT key, COUNT(*) n FROM {table} GROUP BY key"):
+                counts[r["key"]] = counts.get(r["key"], 0) + r["n"]
+        out: dict[str, list[dict]] = {}
+        for r in conn.execute("SELECT * FROM instrument ORDER BY section, name"):
+            row = dict(r)
+            row["entries"] = counts.get(r["key"], 0)
+            out.setdefault(r["section"], []).append(row)
+    return out
+
+
+def entries(key: str, kind: str, limit: int = 100, offset: int = 0
+            ) -> tuple[list[dict], int]:
+    """Historical rows for one instrument, newest first, with a total count.
+
+    Prices and economic series live in different tables — `history` holds daily
+    closes, `observation` holds dated readings with their own change. This
+    hides that split so the archive can show one kind of row.
+    """
+    with connect() as conn:
+        if kind == "symbol":
+            total = conn.execute("SELECT COUNT(*) FROM history WHERE key=?",
+                                 (key,)).fetchone()[0]
+            rows = conn.execute(
+                """SELECT as_of, value, value - prev AS change,
+                          CASE WHEN prev > 0 THEN (value - prev) / prev * 100 END AS pct
+                   FROM (SELECT as_of, close AS value,
+                                LAG(close) OVER (ORDER BY as_of) AS prev
+                         FROM history WHERE key = ?)
+                   ORDER BY as_of DESC LIMIT ? OFFSET ?""",
+                (key, limit, offset)).fetchall()
+        else:
+            total = conn.execute("SELECT COUNT(*) FROM observation WHERE key=?",
+                                 (key,)).fetchone()[0]
+            rows = conn.execute(
+                """SELECT as_of, value, change, pct FROM observation
+                   WHERE key = ? ORDER BY as_of DESC LIMIT ? OFFSET ?""",
+                (key, limit, offset)).fetchall()
+    return [dict(r) for r in rows], total
+
+
+def find_instruments(q: str, limit: int = 40) -> list[sqlite3.Row]:
+    """Match on name, ticker, key or any tag."""
+    like = f"%{q.lower()}%"
+    with connect() as conn:
+        return conn.execute(
+            """SELECT DISTINCT i.* FROM instrument i
+               LEFT JOIN tag t ON t.key = i.key
+               WHERE lower(i.name) LIKE ? OR lower(i.key) LIKE ?
+                  OR lower(COALESCE(i.ticker,'')) LIKE ? OR lower(t.tag) LIKE ?
+               ORDER BY i.section, i.name LIMIT ?""",
+            (like, like, like, like, limit)).fetchall()
+
+
+def find_articles(q: str | None = None, key: str | None = None,
+                  limit: int = 50, offset: int = 0) -> tuple[list[sqlite3.Row], int]:
+    """Headlines by free text, or everything tagged with one instrument."""
+    where, args = ["1=1"], []
+    join = ""
+    if key:
+        join = "JOIN article_tag t ON t.article_id = a.id"
+        where.append("t.tag = ?")
+        args.append(key)
+    if q:
+        where.append("lower(a.title) LIKE ?")
+        args.append(f"%{q.lower()}%")
+    clause = " AND ".join(where)
+    with connect() as conn:
+        total = conn.execute(
+            f"SELECT COUNT(DISTINCT a.id) FROM article a {join} WHERE {clause}",
+            args).fetchone()[0]
+        rows = conn.execute(
+            f"""SELECT DISTINCT a.* FROM article a {join} WHERE {clause}
+                ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
+                LIMIT ? OFFSET ?""", [*args, limit, offset]).fetchall()
+    return rows, total
+
+
+def store_stats() -> dict:
+    with connect() as conn:
+        def one(sql, *a):
+            return conn.execute(sql, a).fetchone()[0]
+        return {
+            "instruments": one("SELECT COUNT(*) FROM instrument"),
+            "observations": one("SELECT COUNT(*) FROM observation"),
+            "closes": one("SELECT COUNT(*) FROM history"),
+            "articles": one("SELECT COUNT(*) FROM article"),
+            "earliest": one("SELECT MIN(d) FROM (SELECT MIN(as_of) d FROM observation "
+                            "UNION SELECT MIN(as_of) FROM history)"),
+            "last_run": one("SELECT MAX(finished_at) FROM ingest_run"),
+        }
+
+
 # --- runs ------------------------------------------------------------------
 
 def start_run(section: str, source: str, started_at: str) -> int:

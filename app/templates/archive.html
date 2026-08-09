@@ -1,0 +1,174 @@
+{#- The archive: everything the store has kept, browsable.
+
+    Rendered server-side from a GET form rather than a JS app. It is a search
+    box and a table; making that depend on JavaScript would buy nothing and
+    cost bookmarkable URLs. -#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }} &middot; cobalt</title>
+{%- for href in styles %}
+<link rel="stylesheet" href="{{ href }}">
+{%- endfor %}
+<script src="{{ scripts.theme }}"></script>
+<script src="{{ scripts.main }}" defer></script>
+{%- if instrument %}
+<script src="{{ scripts.chart }}" defer></script>
+{%- endif %}
+</head>
+<body data-section="archive">
+
+<div class="page-controls">
+  <a class="back" href="/" title="Back to home" aria-label="Back to home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+  </a>
+  <button type="button" class="theme-toggle" id="theme-toggle" title="Switch to day mode" aria-label="Switch to day mode">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="4"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </button>
+</div>
+
+<div class="crumb">
+  <a href="/">cobalt</a> / {% if instrument %}<a href="/sections/archive">archive</a> / {{ instrument.name|safe }}{% else %}archive{% endif %}
+</div>
+
+<h1>{{ heading|safe }}</h1>
+
+<form class="archive-search" method="get" action="/sections/archive">
+  <input type="search" name="q" value="{{ q or '' }}" autocomplete="off"
+         placeholder="search everything &mdash; gold, inflation, nvidia, uranium">
+  <button type="submit">search</button>
+</form>
+
+{%- if stats and not instrument and not q %}
+<p class="source-note">{{ "{:,}".format(stats.observations + stats.closes) }} readings
+across {{ stats.instruments }} instruments, and {{ "{:,}".format(stats.articles) }}
+headlines. Earliest record {{ stats.earliest }}.</p>
+{%- endif %}
+
+{#- ---------------------------------------------------------------- one thing -#}
+{%- if instrument %}
+
+<div class="chart" data-key="{{ instrument.key }}" data-range="YTD">
+  <div class="chart-controls">
+    <div class="chart-pick"><button type="button" class="on" data-key="{{ instrument.key }}">{{ instrument.ticker or instrument.key }}</button></div>
+    <div class="chart-range">
+      {%- for r in ['1M','YTD','1Y','5Y','10Y'] %}
+      <button type="button" data-range="{{ r }}"{% if r == 'YTD' %} class="on"{% endif %}>{{ r }}</button>
+      {%- endfor %}
+    </div>
+  </div>
+  <div class="chart-head"><span class="chart-title meta"></span><span class="chart-readout"></span></div>
+  <div class="chart-frame"><svg class="chart-svg"></svg></div>
+  <div class="chart-foot"><span class="chart-span meta"></span></div>
+</div>
+
+<h2>entries</h2>
+<p class="source-note">{{ "{:,}".format(total) }} readings, newest first.
+{%- if instrument.unit %} Values in {{ instrument.unit|safe }}.{% endif %}
+{%- if tags %} Tagged {{ tags|join(', ') }}.{% endif %}</p>
+
+<div class="table-wrap">
+<table class="quotes">
+  <thead><tr>
+    <th scope="col">Date</th><th scope="col">Value</th>
+    <th scope="col">Change</th><th scope="col">%</th>
+  </tr></thead>
+  <tbody>
+    {%- for r in rows %}
+    <tr>
+      <td>{{ r.as_of }}</td>
+      <td>{{ r.value_text }}</td>
+      <td{% if r.change_cls %} class="{{ r.change_cls }}"{% endif %}>{{ r.change_text|safe }}</td>
+      <td{% if r.pct_cls %} class="{{ r.pct_cls }}"{% endif %}>{{ r.pct_text|safe }}</td>
+    </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+</div>
+
+{% include "_pager.html" %}
+
+{%- if articles %}
+<h2>headlines mentioning it</h2>
+<ul class="stories">
+  {%- for a in articles %}
+  <li class="story">
+    <a class="headline" href="{{ a.url }}" target="_blank" rel="noopener noreferrer">{{ a.title }}</a>
+    <div class="byline">{{ a.publisher }}{% if a.when %} &middot; {{ a.when }}{% endif %}</div>
+  </li>
+  {%- endfor %}
+</ul>
+{%- endif %}
+
+{#- ------------------------------------------------------------------ search -#}
+{%- elif q %}
+
+{%- if instruments %}
+<h2>instruments</h2>
+<ul>
+  {%- for i in instruments %}
+  <li><a href="/sections/archive?key={{ i.key|urlencode }}">{{ i.name|safe }}</a>
+      <span class="meta">{{ i.section }}{% if i.ticker %} &middot; {{ i.ticker }}{% endif %}</span></li>
+  {%- endfor %}
+</ul>
+{%- endif %}
+
+<h2>headlines</h2>
+{%- if articles %}
+<p class="source-note">{{ "{:,}".format(article_total) }} matching.</p>
+<ul class="stories">
+  {%- for a in articles %}
+  <li class="story">
+    <a class="headline" href="{{ a.url }}" target="_blank" rel="noopener noreferrer">{{ a.title }}</a>
+    <div class="byline"><span class="tag tag-{{ a.section }}">{{ a.section }}</span> &middot; {{ a.publisher }}{% if a.when %} &middot; {{ a.when }}{% endif %}</div>
+  </li>
+  {%- endfor %}
+</ul>
+{% include "_pager.html" %}
+{%- else %}
+<p class="source-note">Nothing stored matches that.</p>
+{%- endif %}
+
+{#- ----------------------------------------------------------------- browsing -#}
+{%- else %}
+
+{%- for section, items in sections.items() %}
+<h2>{{ section }}</h2>
+<ul class="archive-list">
+  {%- for i in items %}
+  <li>
+    {%- if i.entries %}
+    <a href="/sections/archive?key={{ i.key|urlencode }}">{{ i.name|safe }}</a>
+    <span class="meta">{{ "{:,}".format(i.entries) }}{% if i.unit %} &middot; {{ i.unit|safe }}{% endif %}</span>
+    {%- else %}
+    <span class="empty-instrument">{{ i.name|safe }}</span>
+    <span class="meta">no data &mdash; no free source</span>
+    {%- endif %}
+  </li>
+  {%- endfor %}
+</ul>
+{%- endfor %}
+
+{%- endif %}
+
+</body>
+</html>
