@@ -131,18 +131,47 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Absolute against the body, not fixed to the viewport: once the column is
-   centred a fixed toggle drifts far off to the right on a wide screen. `right`
-   matches the body's side padding so it lines up with the content edge. */
+/* Corner controls: back to the index, and the day/night toggle.
 
-.theme-toggle {
+   Positioned as one absolute row rather than two independently placed
+   elements — absolute against the body, not fixed to the viewport, because a
+   fixed control drifts away from a centred column on a wide screen. `right`
+   matches the body's side padding, so the row ends on the content edge. */
+
+.page-controls {
   position: absolute;
   top: 44px;
   right: 40px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.theme-toggle,
+.back {
   padding: 6px;
   line-height: 0;
   color: var(--text);
   display: flex;
+}
+
+.back {
+  color: var(--muted);
+}
+
+.back svg {
+  width: 17px;
+  height: 17px;
+}
+
+.back:hover {
+  color: var(--blue);
+  text-decoration: none;   /* it is an icon, not a word */
+}
+
+.back:focus-visible {
+  outline: 1px solid var(--blue);
+  outline-offset: 3px;
 }
 
 .theme-toggle svg {
@@ -163,7 +192,7 @@ body {
    breadcrumb, which sits higher. Nudge the toggle down there so it lands on
    the title's optical centre either way. */
 
-body[data-section="home"] .theme-toggle {
+body[data-section="home"] .page-controls {
   top: 58px;
 }
 
