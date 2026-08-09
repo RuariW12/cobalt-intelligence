@@ -39,6 +39,7 @@ else. It runs on your GPU, so no prompt leaves the machine.
 
 - [Screenshots](#screenshots)
 - [What it tracks](#what-it-tracks)
+- [The archive](#the-archive)
 - [Running it](#running-it)
   - [Behind a VPN](#behind-a-vpn)
 - [Adding summaries](#adding-summaries)
@@ -51,6 +52,7 @@ else. It runs on your GPU, so no prompt leaves the machine.
   - [The document layer](#the-document-layer)
   - [Rendering](#rendering)
 - [Data sources](#data-sources)
+  - [Backfilling](#backfilling)
 - [Project layout](#project-layout)
 - [Development](#development)
 - [Troubleshooting](#troubleshooting)
@@ -74,6 +76,12 @@ Derived rows like the gold/silver ratio are computed locally. What cannot be
 priced for free is listed as such rather than guessed at.
 
 ![Commodities](docs/screenshots/commodities.png)
+
+**The archive.** Everything the store has kept, browsable by section or
+searchable. Counts are shown up front, and the handful of measures with no free
+source are greyed rather than linking to an empty table.
+
+![Archive](docs/screenshots/archive.png)
 
 **AI bubble tracker.** Built around concentration rather than price, and
 organised as the money flows: chips, then the hyperscalers buying them, then
@@ -100,6 +108,26 @@ source, left visible instead of filled in.
 
 Every price page has a chart with 1D, 1W, 1M, YTD, 1Y, 5Y and 10Y ranges, and a
 block of headlines matched to what that page tracks.
+
+---
+
+## The archive
+
+Every reading is kept. `/sections/archive` is the way back into them.
+
+**Browse** by section, with an entry count against each instrument, so you can
+see at a glance what has depth and what does not. **Search** matches
+instruments by name, ticker, key or tag, and headlines by title — one box over
+both. **Open one** and you get its full history, newest first and paginated,
+with a chart, its tags and units, and any headlines that mention it.
+
+It is rendered server-side from a plain GET form. That keeps every view a real
+URL: `/sections/archive?key=CPIAUCSL&offset=900` is a link you can bookmark or
+send to someone, which a JavaScript search box would have cost for no benefit.
+
+Prices and economic series are stored differently — daily closes in one table,
+dated readings with their own change in another — but the archive shows one
+kind of row either way, computing the change for prices as it reads them.
 
 ---
 
@@ -313,6 +341,26 @@ CPI as a level and labelling it "year over year" would be wrong in the way that
 is hardest to notice, so inflation series are fetched as `pc1`, monthly changes
 as `pch`, and GDP as `pca`.
 
+### Backfilling
+
+A fresh install starts with today. To fill in the past:
+
+```sh
+docker compose -f docker/compose.yml run --rm etl --backfill
+```
+
+That pulls every FRED series to inception and ten years of daily closes for
+every symbol — around 230,000 readings, a few minutes, mostly waiting on
+Yahoo. Run it once. It is deliberately not part of a refresh: a treasury series
+is sixteen thousand points and none of them will ever change.
+
+`--since YYYY-MM-DD` limits how far back it goes.
+
+Historical points are stored as observations but produce no documents. Writing
+one per point would add tens of thousands of rows to the model's retrieval
+surface, all stale by definition — the model wants the current reading, not CPI
+from 1974.
+
 Some things are tracked but cannot be priced for free, and are left blank rather
 than guessed: tungsten, uranium, lithium, cobalt, iron ore and nickel. ISM PMI
 was removed from FRED in 2016 over licensing. Forward P/E and index constituent
@@ -327,7 +375,8 @@ cobalt-start.sh  cobalt-stop.sh    the supported way to run it
 app/catalog.py                     every page, panel and row
 app/main.py                        FastAPI: pages, /api/refresh, /api/summarize
 app/render.py                      fills catalog rows from the store
-app/templates/                     base.html + page.html render all 30 pages
+app/templates/                     base.html + page.html render the catalog;
+                                   archive.html is the stored-data browser
 store/                             schema, cleaning, tagging, documents
 etl/                               ingest and the source adapters
 web/                               stylesheets and scripts

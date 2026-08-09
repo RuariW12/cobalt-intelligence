@@ -8,6 +8,7 @@ captures, 842px wide.
 | `home.png` | the index |
 | `news.png` | combined news feed |
 | `commodities.png` | prices, units, YTD, derived rows |
+| `archive.png` | the stored-data browser |
 | `ai-bubble.png` | concentration and the AI supply chain |
 
 To replace one, capture the page at roughly 1400px wide and crop to the
