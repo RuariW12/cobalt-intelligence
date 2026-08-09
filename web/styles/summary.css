@@ -87,3 +87,24 @@
     50%      { opacity: 1; }
   }
 }
+
+/* Summaries arrive as separate paragraphs. Spacing rather than bullets: these
+   are connected observations that read in order, not a list of unrelated
+   items, so they should look like prose with room to breathe. */
+
+.summary-line {
+  margin: 0 0 10px 0;
+}
+
+.summary-line:last-child {
+  margin-bottom: 0;
+}
+
+/* the first line carries the headline finding, so let it lead */
+.summary-line:first-child {
+  color: var(--text);
+}
+
+.summary-line ~ .summary-line {
+  color: var(--muted);
+}

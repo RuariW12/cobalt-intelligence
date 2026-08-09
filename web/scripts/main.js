@@ -4,6 +4,46 @@ function section() {
   return document.body.dataset.section || 'home';
 }
 
+// Break a summary into readable blocks.
+//
+// The model is asked for separated paragraphs and usually obliges, but a
+// language model is not a formatter — when it returns one long block this
+// falls back to sentence boundaries, pairing them so the result is short
+// paragraphs rather than a column of one-line stubs.
+function summaryBlocks(text) {
+  let parts = text.split(/\n\s*\n|\n/).map(s => s.trim()).filter(Boolean);
+
+  // strip list markers if it decided to use them anyway, without eating a
+  // leading figure: "10-year yield rose" must survive intact
+  parts = parts.map(s => s.replace(/^\s*(?:[-–—*•]|\d{1,2}[.)])\s+/, '').trim())
+               .filter(Boolean);
+
+  if (parts.length > 1) return parts;
+
+  // Split only where a terminator is followed by whitespace and a capital.
+  // Matching on the terminator alone cuts "3.7%" in half, which is fatal on a
+  // page made of decimals.
+  const sentences = text.split(/(?<=[.!?])\s+(?=[A-Z"'(])/)
+                        .map(s => s.trim()).filter(Boolean);
+  if (sentences.length < 3) return [text.trim()];
+
+  const blocks = [];
+  for (let i = 0; i < sentences.length; i += 2) {
+    blocks.push(sentences.slice(i, i + 2).join(' '));
+  }
+  return blocks;
+}
+
+function renderSummary(body, text) {
+  const blocks = summaryBlocks(text);
+  body.replaceChildren(...blocks.map(t => {
+    const p = document.createElement('p');
+    p.className = 'summary-line';
+    p.textContent = t;
+    return p;
+  }));
+}
+
 function loader() {
   const dots = document.createElement('span');
   dots.className = 'dots';
@@ -29,7 +69,12 @@ function initSummarize() {
                               { method: 'POST' });
       const data = await res.json();
       if (res.ok) {
-        body.textContent = data.summary || '(the model returned nothing)';
+        if (data.summary) {
+          renderSummary(body, data.summary);
+        } else {
+          body.classList.add('meta');
+          body.textContent = '(the model returned nothing)';
+        }
       } else {
         // Show the reason rather than a spinner that never stops.
         body.classList.add('meta');
