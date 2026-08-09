@@ -67,12 +67,12 @@ headlines. Earliest record {{ stats.earliest }}.</p>
 {#- ---------------------------------------------------------------- one thing -#}
 {%- if instrument %}
 
-<div class="chart" data-key="{{ instrument.key }}" data-range="YTD">
+<div class="chart" data-key="{{ instrument.key }}" data-range="{{ ranges[0] }}">
   <div class="chart-controls">
     <div class="chart-pick"><button type="button" class="on" data-key="{{ instrument.key }}">{{ instrument.ticker or instrument.key }}</button></div>
     <div class="chart-range">
-      {%- for r in ['1M','YTD','1Y','5Y','10Y'] %}
-      <button type="button" data-range="{{ r }}"{% if r == 'YTD' %} class="on"{% endif %}>{{ r }}</button>
+      {%- for r in ranges %}
+      <button type="button" data-range="{{ r }}"{% if loop.first %} class="on"{% endif %}>{{ r }}</button>
       {%- endfor %}
     </div>
   </div>

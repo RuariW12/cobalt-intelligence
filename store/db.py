@@ -142,6 +142,23 @@ def history(key: str, since: str | None = None) -> list[sqlite3.Row]:
         return conn.execute(sql, args).fetchall()
 
 
+def series_points(key: str, since: str | None = None) -> list[tuple[str, float]]:
+    """(date, value) for an economic or derived series, oldest first.
+
+    The chart reads daily closes from `history` for prices; series live in
+    `observation` instead, so they need their own accessor rather than being
+    silently unchartable.
+    """
+    sql = "SELECT as_of, value FROM observation WHERE key = ?"
+    args: list = [key]
+    if since:
+        sql += " AND as_of >= ?"
+        args.append(since)
+    sql += " ORDER BY as_of"
+    with connect() as conn:
+        return [(r["as_of"], r["value"]) for r in conn.execute(sql, args)]
+
+
 def history_start(key: str) -> str | None:
     with connect() as conn:
         row = conn.execute("SELECT MIN(as_of) AS d FROM history WHERE key=?", (key,)).fetchone()

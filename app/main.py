@@ -162,6 +162,7 @@ RANGES: dict[str, dict] = {
     "1Y":  {"days": 365,  "fetch": ("1y", "1d")},
     "5Y":  {"days": 1826, "fetch": ("5y", "1d")},
     "10Y": {"days": 3652, "fetch": ("10y", "1d")},
+    "MAX": {"days": None,  "fetch": ("max", "1d")},
 }
 
 
@@ -173,6 +174,18 @@ async def history(key: str, range: str = "YTD") -> JSONResponse:
             "error": f"unknown range: {range}", "valid": list(RANGES)})
 
     inst = db.instruments().get(key)
+    kind = inst["kind"] if inst else "symbol"
+
+    # Economic and derived series are stored as observations, not daily closes.
+    # They are also already complete, so there is nothing to backfill.
+    if kind in ("series", "derived"):
+        since = None
+        if spec.get("days"):
+            since = (date.today() - timedelta(days=spec["days"])).isoformat()
+        elif spec.get("ytd"):
+            since = date(date.today().year, 1, 1).isoformat()
+        points = await run_in_threadpool(db.series_points, key, since)
+        return JSONResponse(_series_payload(key, inst, range, points))
 
     if "intraday" in spec:
         rng, interval = spec["intraday"]
@@ -185,7 +198,7 @@ async def history(key: str, range: str = "YTD") -> JSONResponse:
 
     today = date.today()
     since = (date(today.year, 1, 1) if spec.get("ytd")
-             else today - timedelta(days=spec["days"])).isoformat()
+             else today - timedelta(days=spec["days"] or 3652)).isoformat()
 
     rows = await run_in_threadpool(db.history, key, since)
     have_from = await run_in_threadpool(db.history_start, key)
@@ -267,7 +280,7 @@ def archive(request: Request, q: str = "", key: str = "", offset: int = 0) -> HT
     ctx = {"q": q, "offset": offset, "per_page": PER_PAGE, "total": 0,
            "stats": db.store_stats(), "instrument": None, "sections": {},
            "instruments": [], "articles": [], "article_total": 0, "tags": [],
-           "rows": [], "title": "archive", "heading": "Archive",
+           "rows": [], "ranges": [], "title": "archive", "heading": "Archive",
            "base_url": "/sections/archive?"}
 
     if key:
@@ -281,7 +294,9 @@ def archive(request: Request, q: str = "", key: str = "", offset: int = 0) -> HT
             r["change_text"], r["change_cls"] = _fmt(r["change"])
             r["pct_text"], r["pct_cls"] = _fmt(r["pct"], "%")
         articles, _ = db.find_articles(key=key, limit=8)
-        ctx.update(instrument=inst, rows=rows, total=total,
+        ranges = (["1M", "YTD", "1Y", "5Y", "10Y", "MAX"] if inst["kind"] == "symbol"
+                  else ["1Y", "5Y", "10Y", "MAX"])
+        ctx.update(instrument=inst, rows=rows, total=total, ranges=ranges,
                    tags=db.tags_for(key),
                    articles=[_article(a) for a in articles],
                    title=inst["name"], heading=inst["name"],
