@@ -1,6 +1,6 @@
 # Cobalt
 
-A market intelligence platform that runs entirely on your own hardware.
+An open-source, market intelligence platform that runs entirely on your own hardware.
 
 Cobalt tracks macroeconomics, interest rates, market indexes, commodities, key
 companies and ETFs, pulls the news around them, and uses a local language model
@@ -21,11 +21,6 @@ decision in it:
 **Only free, public sources.** If something cannot be fetched without a paid
 subscription, it does not go in.
 
-**Gaps are shown as gaps.** Tungsten, uranium, lithium and cobalt have no free
-spot price. Rather than approximate them, those rows are left out and the metals
-are followed through mining ETFs, which the page says plainly. A blank you
-understand is worth more than a number you cannot trust.
-
 **Data is dated, and never overwritten.** Economic series get revised. Every
 observation is stored against the day it belongs to, so a revision stays
 visible instead of quietly replacing history. Prices older than their cadence
@@ -37,12 +32,6 @@ never article text. Every story goes back to whoever wrote it.
 **The model only sees what you see.** Summaries are built from the figures and
 headlines already on the page, with instructions not to introduce anything
 else. It runs on your GPU, so no prompt leaves the machine.
-
-**Relationships over portfolio tracking.** The interesting part is not what you
-own. It is that inflation moves rates, rates move housing, and AI capex moves
-electricity demand and then commodities. Instruments are tagged by economic
-meaning, so a story about NVIDIA reaches the semiconductor page and the AI
-tracker without being filed twice.
 
 ---
 
