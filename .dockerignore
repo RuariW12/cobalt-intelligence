@@ -1,12 +1,16 @@
+# The image copies only requirements.lock, app/, store/, etl/ and web/.
+# Everything else is build context the daemon would ship for no reason.
 .git
 .gitignore
-context/
-data/
-*.md
+.venv/
+.vscode/
+.env
 __pycache__/
 *.pyc
-.env
-.venv/
-docker-compose*.yml
-Dockerfile
-serve.sh
+context/
+docker/
+config/
+*.md
+LICENSE
+cobalt-start.sh
+cobalt-stop.sh

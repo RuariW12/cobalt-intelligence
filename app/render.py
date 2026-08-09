@@ -30,8 +30,27 @@ STALE_AFTER_DAYS = {"symbol": 4, "derived": 4, "series": 70}
 
 DASH = "&mdash;"
 
+# Interpretive tags: useful to the model, far too broad to select headlines
+# with. `geopolitics` sits on oil, so a crypto sanctions story once surfaced on
+# the commodities page.
+BROAD_TAGS = {"geopolitics", "risk-appetite", "liquidity-proxy", "growth-proxy",
+              "leverage", "funding-cost", "derived"}
 
-def _num(v: float, currency: str | None = None) -> str:
+
+def _tracked_tags(pages) -> set[str]:
+    """Instrument keys and themes tracked across the given pages."""
+    wanted: set[str] = set()
+    for page in pages:
+        for panel in page["panels"]:
+            for row in panel.get("rows", []):
+                key = row.get("symbol") or row.get("series") or row.get("derived")
+                if key:
+                    wanted.add(key)
+                    wanted.update(t for t in db.tags_for(key) if t not in BROAD_TAGS)
+    return wanted
+
+
+def _num(v: float | None) -> str:
     if v is None:
         return DASH
     a = abs(v)
@@ -51,7 +70,7 @@ def _cell(field: str, obs) -> tuple[str, str | None]:
     if obs is None:
         return DASH, None
     if field == "value":
-        return _num(obs["value"], obs["currency"]), None
+        return _num(obs["value"]), None
     if field == "change":
         return _signed(obs["change"])
     if field == "pct":
@@ -90,24 +109,12 @@ def _headlines(slug: str, page: dict, limit: int) -> list[dict]:
     tracks — the instrument keys it shows plus their themes — so an NVIDIA
     story reaches both /companies/tech and /ai-bubble without being filed twice.
     """
-    # Interpretive tags are useful to the model but far too broad to pick
-    # headlines with: `geopolitics` sits on oil, so a crypto sanctions story
-    # surfaced on the commodities page.
-    BROAD = {"geopolitics", "risk-appetite", "liquidity-proxy", "growth-proxy",
-             "leverage", "funding-cost", "derived"}
-
     if slug.startswith("sections/news"):
         parts = slug.split("/")
         section = parts[2] if len(parts) > 2 else None
         rows = _spread(db.articles(section=section, limit=limit * 6), limit)
     else:
-        wanted: set[str] = set()
-        for panel in page["panels"]:
-            for row in panel.get("rows", []):
-                key = row.get("symbol") or row.get("series") or row.get("derived")
-                if key:
-                    wanted.add(key)
-                    wanted.update(t for t in db.tags_for(key) if t not in BROAD)
+        wanted = _tracked_tags([page])
         if not wanted:
             return []
         rows = _spread(db.articles(tags=sorted(wanted), limit=limit * 6), limit)
@@ -233,17 +240,5 @@ def digest(section: str, days: int = 400, limit: int = 120) -> str:
 
 
 def _page_tags(section: str) -> set[str]:
-    """Instrument keys and themes tracked anywhere in a section."""
-    BROAD = {"geopolitics", "risk-appetite", "liquidity-proxy", "growth-proxy",
-             "leverage", "funding-cost", "derived"}
-    wanted: set[str] = set()
-    for page in PAGES.values():
-        if page["section"] != section:
-            continue
-        for panel in page["panels"]:
-            for row in panel.get("rows", []):
-                key = row.get("symbol") or row.get("series") or row.get("derived")
-                if key:
-                    wanted.add(key)
-                    wanted.update(t for t in db.tags_for(key) if t not in BROAD)
-    return wanted
+    """Everything tracked anywhere in a section."""
+    return _tracked_tags([p for p in PAGES.values() if p["section"] == section])

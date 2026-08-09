@@ -192,10 +192,6 @@ def articles(section: str | None = None, tags: list[str] | None = None,
         return conn.execute(" ".join(sql), args).fetchall()
 
 
-def article_count() -> int:
-    with connect() as conn:
-        return int(conn.execute("SELECT COUNT(*) FROM article").fetchone()[0])
-
 
 # --- documents -------------------------------------------------------------
 
