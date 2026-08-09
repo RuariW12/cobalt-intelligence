@@ -105,6 +105,12 @@
   <li>{{ i|safe }}</li>
   {%- endfor %}
 </ol>
+{%- elif p.type == 'list' %}
+<ul class="plain">
+  {%- for i in p['items'] %}
+  <li>{{ i|safe }}</li>
+  {%- endfor %}
+</ul>
 {%- elif p.type == 'note' %}
 <p class="{{ p.style if p.style else 'source-note' }}">{{ p.text|safe }}</p>
 {%- endif %}

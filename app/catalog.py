@@ -103,7 +103,10 @@ PAGES = {'': {'title': 'cobalt',
                   'heading': 'about',
                   'items': [{'href': '/sections/about',
                              'label': 'about this site',
-                             'meta': 'sources, licence, and how to run your own'}]}]},
+                             'meta': 'sources, licence, and how to run your own'},
+                            {'href': '/sections/about/setup',
+                             'label': 'setup guide',
+                             'meta': 'install and run it yourself'}]}]},
  'sections/ai-bubble': {'title': 'ai bubble tracker',
                         'h1': 'AI Bubble Tracker',
                         'accent': 'violet',
@@ -1376,35 +1379,12 @@ PAGES = {'': {'title': 'cobalt',
                                 'heading': 'code',
                                 'items': [{'href': 'https://github.com/RuariW12/cobalt',
                                            'label': 'github'},
-                                          {'href': 'https://github.com/RuariW12/cobalt#readme',
+                                          {'href': '/sections/about/setup',
                                            'label': 'setup guide',
-                                           'meta': 'install and troubleshooting'},
+                                           'meta': 'step by step, from scratch'},
                                           {'href': 'https://github.com/RuariW12/cobalt/blob/main/LICENSE',
                                            'label': 'MIT licence',
                                            'meta': 'free to use and change'}]},
-                               {'type': 'steps',
-                                'heading': 'running it',
-                                'items': ['Install <a '
-                                          'href="https://docs.docker.com/get-docker/">Docker</a>.',
-                                          '<code>git clone '
-                                          'https://github.com/RuariW12/cobalt</code>',
-                                          '<code>./cobalt-start.sh</code>',
-                                          'Open <code>localhost:5173</code>.',
-                                          '<code>./cobalt-stop.sh</code> when you are done. Your '
-                                          'data is kept.']},
-                               {'type': 'steps',
-                                'heading': 'adding summaries',
-                                'items': ['Install <a '
-                                          'href="https://ollama.com/download">Ollama</a> on the '
-                                          'same machine. It is a one-line install on Linux: '
-                                          '<code>curl -fsSL https://ollama.com/install.sh | '
-                                          'sh</code>',
-                                          'Pull a model: <code>ollama pull qwen3.5:9b</code>. '
-                                          'Anything around 8&ndash;9B fits a 12GB GPU comfortably.',
-                                          '<code>./cobalt-start.sh --llm</code>. It builds the '
-                                          'settings from <code>config/ollama/Modelfile</code> and '
-                                          'tells you whether the model landed on your GPU.',
-                                          'Press <em>summarize</em> on any page.']},
                                {'type': 'note',
                                 'text': 'The refresh icon next to a page title updates that page. '
                                         'The one on the home page updates everything.'},
@@ -1471,7 +1451,159 @@ PAGES = {'': {'title': 'cobalt',
                                {'type': 'note',
                                 'style': 'disclaimer',
                                 'text': 'Not investment advice &mdash; the data comes from third '
-                                        'parties and can be wrong, late or revised.'}]}}
+                                        'parties and can be wrong, late or revised.'}]},
+ 'sections/about/setup': {'title': 'setup',
+                          'h1': 'Running Cobalt',
+                          'section': 'about',
+                          'crumb': [{'href': '/', 'label': 'cobalt'},
+                                    {'href': '/sections/about', 'label': 'about'},
+                                    {'label': 'setup'}],
+                          'show_refreshed': False,
+                          'refresh': False,
+                          'summarize': False,
+                          'panels': [{'type': 'note',
+                                      'text': 'Everything runs in Docker, so the only thing you '
+                                              'install is Docker itself. Python, the database and '
+                                              'the web server all come inside the image. Expect '
+                                              'about ten minutes, most of it downloading.'},
+                                     {'type': 'list',
+                                      'heading': 'what you need',
+                                      'items': ['<strong>Docker.</strong> Docker Desktop on macOS '
+                                                'and Windows, Docker Engine on Linux.',
+                                                '<strong>Git</strong>, to copy the repository.',
+                                                '<strong>About 2 GB of disk</strong> for the image '
+                                                'and your data.',
+                                                '<strong>Optional: a FRED key.</strong> Free, and '
+                                                'it unlocks the economic series.',
+                                                '<strong>Optional: Ollama and a GPU</strong> for '
+                                                'the summaries. Adds ~6 GB for the model.']},
+                                     {'type': 'steps',
+                                      'heading': '1. install docker',
+                                      'items': ['<strong>Linux.</strong> Follow the <a '
+                                                'href="https://docs.docker.com/engine/install/">Docker '
+                                                'Engine guide</a> for your distribution. Then run '
+                                                '<code>sudo usermod -aG docker $USER</code> and '
+                                                'log out and back in, so you can use Docker '
+                                                'without <code>sudo</code>.',
+                                                '<strong>macOS.</strong> Install <a '
+                                                'href="https://docs.docker.com/desktop/install/mac-install/">Docker '
+                                                'Desktop</a>. Apple silicon and Intel both work.',
+                                                '<strong>Windows.</strong> Install <a '
+                                                'href="https://docs.docker.com/desktop/install/windows-install/">Docker '
+                                                'Desktop</a> and let it enable WSL2 when it asks. '
+                                                'Run every command below from a WSL terminal '
+                                                '(Ubuntu), not PowerShell.',
+                                                'Check it works: <code>docker run --rm '
+                                                'hello-world</code>']},
+                                     {'type': 'steps',
+                                      'heading': '2. get the code',
+                                      'items': ['<code>git clone '
+                                                'https://github.com/RuariW12/cobalt</code>',
+                                                '<code>cd cobalt</code>']},
+                                     {'type': 'steps',
+                                      'heading': '3. add a FRED key (optional)',
+                                      'items': ['Register free at <a '
+                                                'href="https://fredaccount.stlouisfed.org">fredaccount.stlouisfed.org</a> '
+                                                'and request an API key. It arrives instantly.',
+                                                '<code>cp .env.example .env</code>',
+                                                'Open <code>.env</code> and paste the key after '
+                                                '<code>FRED_API_KEY=</code>',
+                                                'Skipping this is fine. Prices, ETFs and news '
+                                                'still work; the macro and interest-rate pages '
+                                                'stay blank.']},
+                                     {'type': 'steps',
+                                      'heading': '4. start it',
+                                      'items': ['<code>./cobalt-start.sh</code> &mdash; the first '
+                                                'run builds the image, which takes a few minutes. '
+                                                'Later runs start in seconds.',
+                                                'Open <a '
+                                                'href="http://localhost:5173">localhost:5173</a>',
+                                                'Click the refresh icon next to the title on the '
+                                                'home page. The first ingest takes about 30 '
+                                                'seconds and fills every page.',
+                                                '<code>./cobalt-stop.sh</code> when you are done. '
+                                                'Your data is kept in a Docker volume and survives '
+                                                'restarts.']},
+                                     {'type': 'steps',
+                                      'heading': '5. summaries (optional)',
+                                      'items': ['Install <a '
+                                                'href="https://ollama.com/download">Ollama</a> on '
+                                                'the same machine. On Linux: <code>curl -fsSL '
+                                                'https://ollama.com/install.sh | sh</code>. On '
+                                                'macOS and Windows, download the installer.',
+                                                '<code>ollama pull qwen3.5:9b</code> &mdash; about '
+                                                '6 GB. Anything around 8&ndash;9B suits a 12 GB '
+                                                'GPU; drop to a 4B model if you have less.',
+                                                '<code>./cobalt-start.sh --llm</code>',
+                                                'The script prints <code>processor -&gt; 100% '
+                                                'GPU</code> if the model loaded onto your graphics '
+                                                'card. Anything else means it is on the CPU and '
+                                                'will be slow.',
+                                                'Press <em>summarize</em> on any page.']},
+                                     {'type': 'list',
+                                      'heading': 'notes on GPUs',
+                                      'items': ['<strong>NVIDIA.</strong> Ollama uses your GPU '
+                                                'directly, no extra setup. You only need the '
+                                                'NVIDIA Container Toolkit if you run Ollama inside '
+                                                'Docker with <code>--container-ollama</code>.',
+                                                '<strong>Apple silicon.</strong> Docker cannot '
+                                                'reach the GPU, which is why Ollama runs on the '
+                                                'host here. It will use the Neural Engine on its '
+                                                'own.',
+                                                '<strong>No GPU.</strong> Everything works; '
+                                                'summaries just take longer.']},
+                                     {'type': 'list',
+                                      'heading': 'using it',
+                                      'items': ['The refresh icon beside a page title updates that '
+                                                'page. The one on the home page updates '
+                                                'everything.',
+                                                'Charts: click any row in a table to chart it, and '
+                                                'use the range buttons for 1D through 10Y.',
+                                                'The moon and sun icon in the corner switches '
+                                                'between night and day.']},
+                                     {'type': 'list',
+                                      'heading': 'if something goes wrong',
+                                      'items': ['<strong>Port 5173 already in use.</strong> Set '
+                                                '<code>COBALT_PORT=5174</code> in '
+                                                '<code>.env</code>. The start script names '
+                                                'whatever is holding the port.',
+                                                '<strong>Permission denied connecting to the '
+                                                'Docker daemon</strong> (Linux). You are not in '
+                                                'the <code>docker</code> group &mdash; run the '
+                                                '<code>usermod</code> step above, then log out and '
+                                                'back in.',
+                                                '<strong>The build fails with a DNS error while '
+                                                'installing packages.</strong> Usually a VPN kill '
+                                                "switch blocking Docker's network. Allow local "
+                                                'network sharing in your VPN client; on Mullvad '
+                                                'that is <code>mullvad lan set allow</code>. The '
+                                                'start script also detects this and works around '
+                                                'it.',
+                                                '<strong>The container says healthy but the page '
+                                                'will not load.</strong> Same VPN cause. Run '
+                                                '<code>./cobalt-start.sh --vpn</code> to bypass '
+                                                "Docker's network.",
+                                                '<strong>Macro and interest-rate pages are '
+                                                'empty.</strong> No FRED key, or you added it '
+                                                'after starting. Restart with '
+                                                '<code>./cobalt-stop.sh</code> then '
+                                                '<code>./cobalt-start.sh</code>.',
+                                                '<strong>Summarize says the model is '
+                                                'unavailable.</strong> Ollama is not running. '
+                                                'Start it, then use <code>./cobalt-start.sh '
+                                                '--llm</code>.',
+                                                '<strong>Summaries take a minute.</strong> The '
+                                                'model is on the CPU. Run <code>ollama ps</code> '
+                                                '&mdash; the processor column should read 100% '
+                                                'GPU.',
+                                                '<strong>Prices look out of date.</strong> Markets '
+                                                'were closed at the last refresh. Hover any row to '
+                                                'see the date the figure belongs to; stale rows '
+                                                'are greyed with a red tick.',
+                                                '<strong>Still stuck?</strong> <a '
+                                                'href="https://github.com/RuariW12/cobalt/issues">Open '
+                                                'an issue</a> with what you ran and what you '
+                                                'saw.']}]}}
 
 
 SECTIONS = sorted({p['section'] for p in PAGES.values()})

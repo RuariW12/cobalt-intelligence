@@ -253,6 +253,34 @@ strong {
   color: var(--muted);
 }
 
+/* An unordered sibling of .steps, for items that are not a sequence — a
+   numbered list of unrelated error messages would imply an order to work
+   through them. */
+
+.plain {
+  list-style: none;
+  margin: 6px 0 0 0;
+  padding: 0;
+}
+
+.plain li {
+  position: relative;
+  padding-left: 24px;
+  margin: 9px 0;
+}
+
+.plain li::before {
+  content: "\2014";          /* em dash */
+  position: absolute;
+  left: 0;
+  color: var(--muted);
+}
+
+.steps li code,
+.plain li code {
+  white-space: nowrap;
+}
+
 .disclaimer {
   color: var(--warn);
   font-size: 14px;
