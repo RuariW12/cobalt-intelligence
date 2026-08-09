@@ -14,7 +14,7 @@
 Deliberately plain — close to raw HTML.
 
 - Dark gray background, white text.
-- No header navbar. Content is left-aligned.
+- No header navbar. A single centred column, `max-width: 780px`.
 - Monospace, modest font sizes, generous line height.
 - Links are white; muted gray (`.meta`) for secondary text.
 

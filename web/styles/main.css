@@ -8,7 +8,8 @@
    shared, so a file per section would leave most of them near-empty:
 
      tokens          the palette and type faces; the only literal colours
-     base            page frame, typography, breadcrumb, page-accent titles
+     base            page frame, typography, breadcrumb, page-accent titles,
+                     the centred column and the theme toggle
      masthead        title row, refresh icon and its spin animation
      summary         llm panel, ask button, three-dot loader
      news            headlines and tags        -> /sections/news, plus the

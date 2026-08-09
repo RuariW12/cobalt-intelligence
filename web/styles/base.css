@@ -1,13 +1,16 @@
 /* base — page frame, typography and the elements every page uses */
 
 body {
+  /* Centred on every page. It used to be the home page only, which meant the
+     column jumped sideways on every navigation. */
+  margin: 0 auto;
+  position: relative;
   background: var(--bg);
   color: var(--text);
   font-family: Charter, 'Bitstream Charter', 'Iowan Old Style', Georgia,
                'Noto Serif', serif;
   font-size: 19px;
   line-height: 1.55;
-  margin: 0;
   padding: 48px 40px;
   max-width: 780px;
 }
@@ -107,10 +110,14 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Absolute against the body, not fixed to the viewport: once the column is
+   centred a fixed toggle drifts far off to the right on a wide screen. `right`
+   matches the body's side padding so it lines up with the content edge. */
+
 .theme-toggle {
-  position: fixed;
-  top: 22px;
-  right: 22px;
+  position: absolute;
+  top: 44px;
+  right: 40px;
   background: none;
   border: none;
   padding: 6px;
@@ -133,6 +140,14 @@ body {
 .theme-toggle:focus-visible {
   outline: 1px solid var(--blue);
   outline-offset: 3px;
+}
+
+/* The home page opens with its title; every other page opens with a
+   breadcrumb, which sits higher. Nudge the toggle down there so it lands on
+   the title's optical centre either way. */
+
+body[data-section="home"] .theme-toggle {
+  top: 58px;
 }
 
 /* the icon shows the mode you are in: moon at night, sun by day */
