@@ -1,38 +1,73 @@
 // Placeholder page behaviour. Nothing is wired to a backend yet.
 
-// Summarize: swap the summary body for a three-dot loader. There is no model
-// connected, so the loader runs indefinitely by design — reload to reset.
+function section() {
+  return document.body.dataset.section || 'home';
+}
+
+function loader() {
+  const dots = document.createElement('span');
+  dots.className = 'dots';
+  dots.setAttribute('role', 'status');
+  dots.setAttribute('aria-label', 'Working');
+  for (let i = 0; i < 3; i++) dots.appendChild(document.createElement('span'));
+  return dots;
+}
+
+// Summarize: ask the local model about this section and show what comes back.
 function initSummarize() {
   const button = document.getElementById('summarize');
   const body = document.querySelector('.summary-body');
   if (!button || !body) return;
 
-  button.addEventListener('click', () => {
+  button.addEventListener('click', async () => {
     button.disabled = true;
-
-    const dots = document.createElement('span');
-    dots.className = 'dots';
-    dots.setAttribute('role', 'status');
-    dots.setAttribute('aria-label', 'Generating summary');
-    for (let i = 0; i < 3; i++) {
-      dots.appendChild(document.createElement('span'));
-    }
-
     body.classList.remove('meta');
-    body.replaceChildren(dots);
+    body.replaceChildren(loader());
+
+    try {
+      const res = await fetch(`/api/summarize?section=${encodeURIComponent(section())}`,
+                              { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        body.textContent = data.summary || '(the model returned nothing)';
+      } else {
+        // Show the reason rather than a spinner that never stops.
+        body.classList.add('meta');
+        body.textContent = `${data.error || 'failed'}${data.hint ? ' — ' + data.hint : ''}`;
+      }
+    } catch (err) {
+      body.classList.add('meta');
+      body.textContent = 'could not reach the app';
+    } finally {
+      button.disabled = false;
+    }
   });
 }
 
-// Refresh: spin the icon while an ingest runs. No ETL is connected yet, so it
-// spins indefinitely — removing .spinning is what returns it to resting grey.
+// Refresh: run this section's ingest, then reload so the page shows it.
 function initRefresh() {
   const button = document.getElementById('refresh');
   if (!button) return;
 
-  button.addEventListener('click', () => {
+  button.addEventListener('click', async () => {
     if (button.classList.contains('spinning')) return;
     button.classList.add('spinning');
     button.setAttribute('aria-busy', 'true');
+
+    try {
+      const res = await fetch(`/api/refresh?section=${encodeURIComponent(section())}`,
+                              { method: 'POST' });
+      if (res.ok) {
+        window.location.reload();
+        return;
+      }
+      const data = await res.json().catch(() => ({}));
+      button.title = `refresh failed: ${data.error || res.status}`;
+    } catch (err) {
+      button.title = 'could not reach the app';
+    }
+    button.classList.remove('spinning');
+    button.removeAttribute('aria-busy');
   });
 }
 

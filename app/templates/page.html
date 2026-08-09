@@ -19,14 +19,14 @@
 {%- elif p.type == 'metrics' %}
 <ul class="metrics">
   {%- for r in p.rows %}
-  <li class="metric placeholder"
+  <li class="metric{% if not r.has_data %} placeholder{% endif %}"
       {%- if r.series %} data-series="{{ r.series }}"{% endif %}
       {%- if r.derived %} data-derived="{{ r.derived }}"{% endif %}
       {%- if r.manual %} data-manual="{{ r.manual }}"{% endif %}
       {%- if r.source %} data-source="{{ r.source }}"{% endif %}>
     <span class="metric-name">{{ r.name|safe }}{% if r.period %} <span class="metric-period">{{ r.period|safe }}</span>{% endif %}</span>
-    <span class="metric-value">&mdash;</span>
-    <span class="metric-change">&mdash;</span>
+    <span class="metric-value">{{ r.value_text|default('&mdash;')|safe }}</span>
+    <span class="metric-change{% if r.change_cls %} {{ r.change_cls }}{% endif %}">{{ r.change_text|default('&mdash;')|safe }}</span>
   </li>
   {%- endfor %}
 </ul>
@@ -42,15 +42,12 @@
   </thead>
   <tbody>
     {%- for r in p.rows %}
-    <tr class="placeholder"{% if r.symbol %} data-symbol="{{ r.symbol }}"{% endif %}>
+    <tr class="{% if not r.has_data %}placeholder{% endif %}"{% if r.symbol %} data-symbol="{{ r.symbol }}"{% endif %}>
       <td>{% if r.session %}<span class="session"></span>{% endif %}{{ r.name|safe }}
           {%- if r.unit %} <span class="unit">{{ r.unit|safe }}</span>{% endif %}
           {%- if r.region %} <span class="region">{{ r.region|safe }}</span>{% endif %}</td>
-      {%- if r.ticker %}
-      <td class="ticker">{{ r.ticker }}</td>
-      {%- endif %}
-      {%- for _ in range(p.columns|length - (2 if r.ticker else 1)) %}
-      <td>&mdash;</td>
+      {%- for c in r.cells %}
+      <td{% if c.cls %} class="{{ c.cls }}"{% endif %}>{{ c.text|safe }}</td>
       {%- endfor %}
     </tr>
     {%- endfor %}

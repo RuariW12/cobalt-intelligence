@@ -641,7 +641,7 @@ PAGES = {'': {'title': 'cobalt',
                                                'unit': 'Vanguard',
                                                'ticker': 'VTI'},
                                               {'name': 'S&amp;P 500',
-                                               'symbol': '^GSPC',
+                                               'symbol': 'VOO',
                                                'unit': 'Vanguard',
                                                'ticker': 'VOO'},
                                               {'name': 'Nasdaq-100',
@@ -1353,3 +1353,24 @@ PAGES = {'': {'title': 'cobalt',
 
 
 SECTIONS = sorted({p['section'] for p in PAGES.values()})
+
+
+def _check_invariants() -> None:
+    """A row that prints a ticker must fetch that same ticker.
+
+    This caught a real bug: the VOO row carried symbol ^GSPC, so the page
+    showed the S&P 500 index level (7757) where the ETF price (~710) belonged —
+    plausible-looking, wrong, and completely silent.
+    """
+    for slug, page in PAGES.items():
+        for panel in page["panels"]:
+            for row in panel.get("rows", []):
+                ticker, symbol = row.get("ticker"), row.get("symbol")
+                if ticker and symbol and ticker != symbol:
+                    raise ValueError(
+                        f"{slug}: row {row.get('name')!r} prints ticker {ticker} "
+                        f"but fetches {symbol}"
+                    )
+
+
+_check_invariants()

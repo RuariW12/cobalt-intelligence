@@ -45,7 +45,7 @@
 <div class="masthead">
   <span class="meta">{{ page.tagline|safe }}
     {%- if page.show_refreshed %}{% if page.tagline %} &mdash; {% endif %}last refreshed:
-    <span class="refreshed" data-refreshed="">never</span>{% endif %}</span>
+    <span class="refreshed" data-refreshed="">{{ page.refreshed|default("never") }}</span>{% endif %}</span>
   {%- if page.refresh %}
   <button type="button" id="refresh" class="refresh" title="{{ page.refresh_label }}" aria-label="{{ page.refresh_label }}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
