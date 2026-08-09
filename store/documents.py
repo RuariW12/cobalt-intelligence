@@ -83,3 +83,26 @@ def build(inst: dict, obs: dict, tags: list[str]) -> dict:
         "body": sentence(inst, obs),
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
+
+
+def article(a: dict) -> dict:
+    """A headline as a retrievable document.
+
+    Headline, publisher and date only — the body is never stored. That is
+    enough for the model to say what is being reported and to cite a link.
+    """
+    when = (a.get("published_at") or a.get("fetched_at") or "")[:10]
+    return {
+        "doc_type": "article",
+        "ref_key": a["url"],
+        "as_of": when,
+        # section mirrors the page that shows it, category the feed it came
+        # from — matching how observation documents are filed, so retrieval by
+        # section works the same for both.
+        "section": "news",
+        "category": a["section"],
+        "tags": " ".join(a.get("tags") or []),
+        "title": a["title"],
+        "body": f"{when} — [{a['section']}] {a['title']} ({a['publisher']}) {a['url']}",
+        "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }

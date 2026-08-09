@@ -148,6 +148,55 @@ def history_start(key: str) -> str | None:
         return row["d"] if row and row["d"] else None
 
 
+# --- articles --------------------------------------------------------------
+
+def write_articles(rows: Iterable[dict]) -> int:
+    """Insert headlines, ignoring ones already stored under the same URL."""
+    rows = list(rows)
+    if not rows:
+        return 0
+    written = 0
+    with connect() as conn:
+        for r in rows:
+            cur = conn.execute(
+                """INSERT INTO article (url,title,publisher,section,published_at,fetched_at)
+                   VALUES (:url,:title,:publisher,:section,:published_at,:fetched_at)
+                   ON CONFLICT(url) DO NOTHING""", r)
+            if cur.rowcount:
+                written += 1
+            row = conn.execute("SELECT id FROM article WHERE url=?", (r["url"],)).fetchone()
+            if row and r.get("tags"):
+                conn.executemany(
+                    "INSERT OR IGNORE INTO article_tag (article_id, tag) VALUES (?,?)",
+                    [(row["id"], t) for t in r["tags"]])
+    return written
+
+
+def articles(section: str | None = None, tags: list[str] | None = None,
+             limit: int = 12) -> list[sqlite3.Row]:
+    """Newest headlines, by section or by anything they mention."""
+    sql = ["SELECT DISTINCT a.* FROM article a"]
+    args: list = []
+    if tags:
+        sql.append("JOIN article_tag t ON t.article_id = a.id")
+    sql.append("WHERE 1=1")
+    if section:
+        sql.append("AND a.section = ?")
+        args.append(section)
+    if tags:
+        sql.append("AND t.tag IN (%s)" % ",".join("?" * len(tags)))
+        args.extend(tags)
+    sql.append("ORDER BY COALESCE(a.published_at, a.fetched_at) DESC LIMIT ?")
+    args.append(limit)
+    with connect() as conn:
+        return conn.execute(" ".join(sql), args).fetchall()
+
+
+def article_count() -> int:
+    with connect() as conn:
+        return int(conn.execute("SELECT COUNT(*) FROM article").fetchone()[0])
+
+
 # --- documents -------------------------------------------------------------
 
 def write_documents(rows: Iterable[dict]) -> int:
@@ -161,6 +210,7 @@ def write_documents(rows: Iterable[dict]) -> int:
                VALUES (:doc_type,:ref_key,:as_of,:section,:category,:tags,:title,:body,
                        :created_at)
                ON CONFLICT(doc_type,ref_key,as_of) DO UPDATE SET
+                 section=excluded.section, category=excluded.category,
                  tags=excluded.tags, title=excluded.title, body=excluded.body,
                  created_at=excluded.created_at""",
             rows,
@@ -170,7 +220,8 @@ def write_documents(rows: Iterable[dict]) -> int:
 
 def search_documents(section: str | None = None, tags: list[str] | None = None,
                      since: str | None = None, limit: int = 200,
-                     latest_only: bool = True) -> list[sqlite3.Row]:
+                     latest_only: bool = True, doc_type: str | None = None,
+                     any_tags: list[str] | None = None) -> list[sqlite3.Row]:
     """Retrieval by metadata. Embeddings can rank within this later; filtering
     on tag and date first keeps that candidate set small and on-topic.
 
@@ -192,9 +243,15 @@ def search_documents(section: str | None = None, tags: list[str] | None = None,
     if section and section not in ("home", "all"):
         sql.append("AND section = ?")
         args.append(section)
-    for t in tags or []:
+    for t in tags or []:                       # every tag must be present
         sql.append("AND (' ' || tags || ' ') LIKE ?")
         args.append(f"% {t} %")
+    if any_tags:                               # at least one must be present
+        sql.append("AND (" + " OR ".join("(' ' || tags || ' ') LIKE ?" for _ in any_tags) + ")")
+        args.extend(f"% {t} %" for t in any_tags)
+    if doc_type:
+        sql.append("AND doc_type = ?")
+        args.append(doc_type)
     if since:
         sql.append("AND as_of >= ?")
         args.append(since)

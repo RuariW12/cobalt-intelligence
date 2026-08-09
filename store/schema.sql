@@ -64,6 +64,32 @@ CREATE TABLE IF NOT EXISTS tag (
 
 CREATE INDEX IF NOT EXISTS tag_by_tag ON tag (tag);
 
+-- Headlines. `url` is UNIQUE, which is what enforces global deduplication:
+-- the same story syndicated to three feeds is stored once, so a page can never
+-- show it twice. Bodies are never stored — only headline, link and timestamp,
+-- so the app links out rather than mirroring anyone's content.
+CREATE TABLE IF NOT EXISTS article (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    url          TEXT UNIQUE NOT NULL,
+    title        TEXT NOT NULL,
+    publisher    TEXT NOT NULL,
+    section      TEXT NOT NULL,          -- politics | economics | tech
+    published_at TEXT,
+    fetched_at   TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS article_recent ON article (section, published_at DESC);
+
+-- Which instruments and themes a headline mentions, so a data page can pull
+-- the stories about what it tracks.
+CREATE TABLE IF NOT EXISTS article_tag (
+    article_id INTEGER NOT NULL REFERENCES article(id) ON DELETE CASCADE,
+    tag        TEXT NOT NULL,
+    PRIMARY KEY (article_id, tag)
+);
+
+CREATE INDEX IF NOT EXISTS article_tag_by_tag ON article_tag (tag);
+
 -- The retrieval surface. `body` is a complete sentence; `tags` is a
 -- space-delimited string so a LIKE filter works without a join.
 CREATE TABLE IF NOT EXISTS document (

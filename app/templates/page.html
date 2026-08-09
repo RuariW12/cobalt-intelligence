@@ -59,12 +59,23 @@
 </div>
 {%- elif p.type == 'stories' %}
 <ul class="stories"{% if p.tags %} data-source="news" data-tags="{{ p.tags }}"{% endif %}>
+  {%- if p.articles %}
+  {%- for a in p.articles %}
+  <li class="story">
+    <a class="headline" href="{{ a.url }}" target="_blank" rel="noopener noreferrer">{{ a.title }}</a>
+    <div class="byline">
+      {%- if p.tags %}<span class="tag tag-{{ a.section }}">{{ a.section }}</span> &middot; {% endif %}
+      {{- a.publisher }}{% if a.when %} &middot; {{ a.when }}{% endif %}</div>
+  </li>
+  {%- endfor %}
+  {%- else %}
   {%- for s in p['items'] %}
   <li class="story placeholder">
     <a class="headline" href="#">Headline text appears here, linking to the source</a>
     <div class="byline">{% if s.tag %}<span class="tag {{ s.tag_class }}">{{ s.tag|safe }}</span> &middot; {% endif %}source &middot; &mdash;</div>
   </li>
   {%- endfor %}
+  {%- endif %}
 </ul>
 {%- elif p.type == 'chart' %}
 <div class="chart" data-key="{{ p.instruments[0].key }}" data-range="{{ p.default_range }}">

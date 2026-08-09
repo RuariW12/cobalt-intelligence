@@ -48,3 +48,9 @@
 .tag-politics  { color: var(--clay); }
 .tag-economics { color: var(--green); }
 .tag-tech      { color: var(--violet); }
+
+/* headline lists render an article's own section, so the class comes from the
+   data rather than the template */
+.tag-politics,
+.tag-economics,
+.tag-tech { font-variant: none; }

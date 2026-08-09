@@ -116,3 +116,91 @@ def for_instrument(key: str, kind: str, section: str, category: str | None) -> l
             tags.update(themes)
 
     return sorted(t for t in tags if t)
+
+
+# --- tagging headlines -----------------------------------------------------
+
+# Themes a headline can carry without naming any instrument. This is what lets
+# a macro page pull relevant stories: nothing on /macro/inflation is a company,
+# so entity matching alone would leave it empty.
+KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    (r"inflation|consumer price|cpi\b|deflation", ("inflation",)),
+    (r"federal reserve|\bfed\b|fomc|rate cut|rate hike|powell",
+     ("monetary-policy", "rates")),
+    (r"treasury yield|bond market|yield curve", ("rates", "treasuries")),
+    (r"jobs report|unemployment|payroll|jobless|hiring|layoff", ("labor",)),
+    (r"\bgdp\b|recession|economic growth", ("growth",)),
+    (r"oil price|crude|opec|barrel", ("oil", "energy")),
+    (r"natural gas|lng\b", ("natural-gas", "energy")),
+    (r"\bgold\b|bullion|silver price", ("precious-metals",)),
+    (r"copper|lithium|rare earth|critical mineral", ("industrial-metals",)),
+    (r"uranium|nuclear (power|plant|reactor)", ("energy", "datacenter-power")),
+    (r"bitcoin|crypto|ethereum", ("crypto",)),
+    (r"artificial intelligence|\bai\b|chatgpt|openai|anthropic|llm\b",
+     ("ai-supply-chain",)),
+    (r"data ?cent(er|re)|gpu\b|semiconductor|chip(maker|s)?\b",
+     ("semiconductors", "ai-supply-chain")),
+    (r"tariff|trade war|sanction|export control", ("geopolitics",)),
+    (r"housing|mortgage|home sales", ("housing",)),
+    (r"\bs&p 500\b|nasdaq|dow jones|stock market", ("equities", "us-market")),
+)
+
+_KEYWORDS = tuple((re.compile(p, re.I), t) for p, t in KEYWORDS)
+
+# Names too short or too common to match safely: "GE", "Strategy", "Apple" in a
+# fruit story. Tickers are matched case-sensitively for the same reason — "CAT"
+# is a company, "cat" is not.
+MIN_NAME_LEN = 5
+MIN_TICKER_LEN = 3
+
+# Instrument names that are ordinary English words. Matching these on the name
+# alone tagged "Silver nanocatalysts switch reaction sites" as a precious-metals
+# story. They only count when the headline also reads like market news.
+AMBIGUOUS_NAMES = {
+    "gold", "silver", "copper", "aluminum", "strategy", "energy",
+    "consumer", "industrial", "financials", "growth",
+}
+
+MARKET_CONTEXT = re.compile(
+    r"\b(pric|futures|market|rall|slump|surge|record high|record low|ounce|"
+    r"barrel|tonne|demand|supply|output|trader|investor|export|import|"
+    r"stockpile|inventor|miner|refinery|commodit)", re.I)
+
+
+def build_matchers(instruments: dict) -> list[tuple[re.Pattern, str, tuple[str, ...]]]:
+    """Compile one matcher per instrument, plus its themes.
+
+    A headline mentioning NVIDIA should tag as `NVDA` *and* inherit
+    `semiconductors` and `ai-supply-chain`, so it reaches the AI page as well
+    as the company page.
+    """
+    out = []
+    for key, inst in instruments.items():
+        name = (inst["name"] or "").strip()
+        ticker = (inst["ticker"] or "").strip()
+        themes = tuple(THEMES.get(key, ())) + tuple(
+            t for members, ts in GROUPS if key in members for t in ts)
+
+        if len(name) >= MIN_NAME_LEN:
+            out.append((re.compile(rf"\b{re.escape(name)}\b", re.I), key, themes,
+                        name.lower() in AMBIGUOUS_NAMES))
+        if len(ticker) >= MIN_TICKER_LEN:
+            # case-sensitive: "CAT" is a company, "cat" is not
+            out.append((re.compile(rf"\b{re.escape(ticker)}\b"), key, themes, False))
+    return out
+
+
+def for_article(title: str, matchers) -> list[str]:
+    tags: set[str] = set()
+    market_news = bool(MARKET_CONTEXT.search(title))
+    for pattern, key, themes, needs_context in matchers:
+        if not pattern.search(title):
+            continue
+        if needs_context and not market_news:
+            continue
+        tags.add(key)
+        tags.update(themes)
+    for pattern, themes in _KEYWORDS:
+        if pattern.search(title):
+            tags.update(themes)
+    return sorted(tags)

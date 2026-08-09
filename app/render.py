@@ -61,6 +61,68 @@ def _cell(field: str, obs) -> tuple[str, str | None]:
     return DASH, None
 
 
+def _spread(rows: list, limit: int) -> list:
+    """One story per publisher in turn, until the slots are full.
+
+    Sorting purely by recency hands the page to whichever feed posts most
+    often — Hacker News filled every slot and pushed Ars Technica and The Verge
+    off entirely. Rows arrive newest-first, so taking them round-robin keeps
+    recency within each publisher while guaranteeing a mix across them.
+    """
+    by_publisher: dict[str, list] = {}
+    for r in rows:
+        by_publisher.setdefault(r["publisher"], []).append(r)
+
+    out: list = []
+    while len(out) < limit and any(by_publisher.values()):
+        for queue in by_publisher.values():
+            if queue:
+                out.append(queue.pop(0))
+                if len(out) >= limit:
+                    break
+    return out
+
+
+def _headlines(slug: str, page: dict, limit: int) -> list[dict]:
+    """Which stories belong on this page.
+
+    News pages filter by their own subsection. Every other page asks by what it
+    tracks — the instrument keys it shows plus their themes — so an NVIDIA
+    story reaches both /companies/tech and /ai-bubble without being filed twice.
+    """
+    # Interpretive tags are useful to the model but far too broad to pick
+    # headlines with: `geopolitics` sits on oil, so a crypto sanctions story
+    # surfaced on the commodities page.
+    BROAD = {"geopolitics", "risk-appetite", "liquidity-proxy", "growth-proxy",
+             "leverage", "funding-cost", "derived"}
+
+    if slug.startswith("sections/news"):
+        parts = slug.split("/")
+        section = parts[2] if len(parts) > 2 else None
+        rows = _spread(db.articles(section=section, limit=limit * 6), limit)
+    else:
+        wanted: set[str] = set()
+        for panel in page["panels"]:
+            for row in panel.get("rows", []):
+                key = row.get("symbol") or row.get("series") or row.get("derived")
+                if key:
+                    wanted.add(key)
+                    wanted.update(t for t in db.tags_for(key) if t not in BROAD)
+        if not wanted:
+            return []
+        rows = _spread(db.articles(tags=sorted(wanted), limit=limit * 6), limit)
+
+    out = []
+    for r in rows:
+        when = r["published_at"] or r["fetched_at"]
+        out.append({
+            "title": r["title"], "url": r["url"], "publisher": r["publisher"],
+            "when": _humanise(when) if when else "",
+            "section": r["section"],
+        })
+    return out
+
+
 def _age(obs) -> tuple[str | None, bool]:
     """(as_of, is_stale) for a stored observation."""
     if obs is None:
@@ -84,7 +146,10 @@ def build(slug: str) -> dict | None:
     page["refreshed"] = _humanise(stamp) if stamp else "never"
 
     for panel in page["panels"]:
-        if panel["type"] == "quotes":
+        if panel["type"] == "stories":
+            panel["articles"] = _headlines(slug, page, len(panel.get("items") or []) or 6)
+
+        elif panel["type"] == "quotes":
             for row in panel["rows"]:
                 obs = latest.get(("symbol", row["symbol"])) if row.get("symbol") else None
                 cells = []
@@ -137,25 +202,48 @@ def _humanise(iso: str) -> str:
 def digest(section: str, days: int = 400, limit: int = 120) -> str:
     """What the model reads: retrieved documents, not a re-derived table.
 
-    Each document is already a dated, tagged sentence, so retrieval is a
-    metadata filter rather than a formatting job — and the same rows will feed
-    an embedding index later without being rebuilt.
+    Two kinds are pulled and labelled separately — the figures for this
+    section, and the headlines about what it tracks. Combining them is the
+    point of the app: the numbers say what moved, the headlines say why.
     """
-    # A wide floor, not a window: this only excludes series that have stopped
-    # updating entirely. Recency per instrument is handled by latest_only.
     since = (datetime.now(timezone.utc).date() - timedelta(days=days)).isoformat()
-    rows = db.search_documents(section=section, since=since, limit=limit,
-                               latest_only=True)
-    if not rows:
-        return "(no data has been ingested yet)"
-
-    by_section: dict[str, list[str]] = {}
-    for r in rows:
-        by_section.setdefault(r["section"] or "other", []).append(r["body"])
-
     out: list[str] = []
-    for name, bodies in by_section.items():
-        out.append(f"## {name}")
-        out.extend(bodies)
+
+    data = db.search_documents(section=section, since=since, limit=limit,
+                               doc_type="observation", latest_only=True)
+    if data:
+        out.append("## current figures")
+        out.extend(r["body"] for r in data)
         out.append("")
-    return "\n".join(out).strip()
+
+    recent = (datetime.now(timezone.utc).date() - timedelta(days=4)).isoformat()
+    if section in ("news", "home", "all"):
+        news = db.search_documents(section="news", since=recent, limit=40,
+                                   doc_type="article", latest_only=False)
+    else:
+        wanted = _page_tags(section)
+        news = (db.search_documents(any_tags=sorted(wanted), since=recent, limit=15,
+                                    doc_type="article", latest_only=False)
+                if wanted else [])
+    if news:
+        out.append("## headlines")
+        out.extend(r["body"] for r in news)
+
+    return "\n".join(out).strip() or "(no data has been ingested yet)"
+
+
+def _page_tags(section: str) -> set[str]:
+    """Instrument keys and themes tracked anywhere in a section."""
+    BROAD = {"geopolitics", "risk-appetite", "liquidity-proxy", "growth-proxy",
+             "leverage", "funding-cost", "derived"}
+    wanted: set[str] = set()
+    for page in PAGES.values():
+        if page["section"] != section:
+            continue
+        for panel in page["panels"]:
+            for row in panel.get("rows", []):
+                key = row.get("symbol") or row.get("series") or row.get("derived")
+                if key:
+                    wanted.add(key)
+                    wanted.update(t for t in db.tags_for(key) if t not in BROAD)
+    return wanted

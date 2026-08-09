@@ -15,7 +15,7 @@ import sys
 from datetime import datetime, timezone
 
 from app.catalog import PAGES, SECTIONS
-from etl.sources import fred, yahoo
+from etl.sources import fred, news, yahoo
 from store import clean, db, documents
 from store import tags as tagging
 from store.catalog_sync import sync as sync_instruments
@@ -184,6 +184,36 @@ def ingest(section: str = "all") -> dict:
             result["failed"] += failed
             result["sources"]["fred"] = {"requested": len(series_ids), "written": written,
                                          "failed": len(failed), "suspect": suspect}
+
+    # News is section-independent: one sweep of the feeds serves every page,
+    # and the URL unique constraint means re-running is cheap and idempotent.
+    if section in ("all", "home", "news") or True:
+        run_id = db.start_run(section, "news", now)
+        try:
+            items, failed_feeds = news.fetch()
+            matchers = tagging.build_matchers(insts)
+            seen: set[str] = set()
+            tagged = []
+            for a in items:
+                if a["url"] in seen:
+                    continue
+                seen.add(a["url"])
+                a["tags"] = tagging.for_article(a["title"], matchers)
+                tagged.append(a)
+            new = db.write_articles(tagged)
+            db.write_documents([documents.article(a) for a in tagged])
+            db.finish_run(run_id, datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                          "ok" if not failed_feeds else "partial", new,
+                          ", ".join(failed_feeds) or None)
+            result["sources"]["news"] = {
+                "fetched": len(items), "new": new,
+                "tagged": sum(1 for a in tagged if a["tags"]),
+                "failed_feeds": failed_feeds,
+            }
+        except Exception as exc:
+            db.finish_run(run_id, datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                          "error", 0, str(exc))
+            result["sources"]["news"] = {"error": str(exc)}
 
     derived = compute_derived()
     if derived:
