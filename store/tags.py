@@ -123,6 +123,9 @@ def for_instrument(key: str, kind: str, section: str, category: str | None) -> l
 # Themes a headline can carry without naming any instrument. This is what lets
 # a macro page pull relevant stories: nothing on /macro/inflation is a company,
 # so entity matching alone would leave it empty.
+# (pattern, tags, exclusion). Broad market words are ambiguous across domains:
+# "power bank" is not a lender and a bitcoin miner is not a copper mine, so the
+# rules that need it carry an exclusion that vetoes the match.
 KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
     (r"inflation|consumer price|cpi\b|deflation", ("inflation",)),
     (r"federal reserve|\bfed\b|fomc|rate cut|rate hike|powell",
@@ -142,10 +145,29 @@ KEYWORDS: tuple[tuple[str, tuple[str, ...]], ...] = (
      ("semiconductors", "ai-supply-chain")),
     (r"tariff|trade war|sanction|export control", ("geopolitics",)),
     (r"housing|mortgage|home sales", ("housing",)),
-    (r"\bs&p 500\b|nasdaq|dow jones|stock market", ("equities", "us-market")),
+    (r"\bs&p 500\b|nasdaq|dow jones|stock market|\bstocks\b|wall street|\bequities\b",
+     ("equities", "us-market"), r"crypto|bitcoin|tokeni[sz]ed"),
+    # deliberately not bare "shares": "Buttigieg shares his theory" is not a
+    # markets story
+    (r"\bshare price|\bshareholders?\b|\bipo\b|\bbuyback", ("equities",)),
+    # "banks" plural and "central bank" only: the singular catches power banks,
+    # food banks and river banks
+    (r"central bank|\bbanks\b|\bbanking\b|\blenders?\b|\bcredit\b|bond market|\bdefaults?\b",
+     ("financials", "credit"), r"power bank|blood bank|food bank|bank holiday"),
+    (r"\beconom(y|ic|ies)\b|recession|\boutput\b", ("growth",)),
+    (r"manufactur|\bfactor(y|ies)\b|industrial production", ("industrial-activity",)),
+    (r"consumer spending|retail sales|\bshoppers?\b|consumer credit",
+     ("consumer-spending", "demand")),
+    (r"\bmining\b|\bminers?\b|rare earth|critical mineral",
+     ("materials-proxy", "critical-materials"), r"bitcoin|crypto|hashrate|data ?mining"),
+    (r"nikkei|hang seng|shanghai composite|asian markets?|european stocks",
+     ("equities", "international")),
 )
 
-_KEYWORDS = tuple((re.compile(p, re.I), t) for p, t in KEYWORDS)
+_KEYWORDS = tuple(
+    (re.compile(rule[0], re.I), rule[1],
+     re.compile(rule[2], re.I) if len(rule) > 2 and rule[2] else None)
+    for rule in KEYWORDS)
 
 # Names too short or too common to match safely: "GE", "Strategy", "Apple" in a
 # fruit story. Tickers are matched case-sensitively for the same reason — "CAT"
@@ -200,7 +222,7 @@ def for_article(title: str, matchers) -> list[str]:
             continue
         tags.add(key)
         tags.update(themes)
-    for pattern, themes in _KEYWORDS:
-        if pattern.search(title):
+    for pattern, themes, veto in _KEYWORDS:
+        if pattern.search(title) and not (veto and veto.search(title)):
             tags.update(themes)
     return sorted(tags)

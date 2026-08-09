@@ -225,10 +225,40 @@ def ingest(section: str = "all") -> dict:
     return result
 
 
+def retag() -> int:
+    """Re-apply the tag vocabulary to every stored headline.
+
+    Tagging happens at ingest, so widening the keyword patterns would otherwise
+    only affect articles fetched afterwards — leaving a corpus half-tagged
+    under two different vocabularies.
+    """
+    db.init()
+    sync_instruments()
+    matchers = tagging.build_matchers(db.instruments())
+    n = 0
+    with db.connect() as conn:
+        rows = conn.execute("SELECT id, title FROM article").fetchall()
+        for r in rows:
+            tags = tagging.for_article(r["title"], matchers)
+            conn.execute("DELETE FROM article_tag WHERE article_id=?", (r["id"],))
+            if tags:
+                conn.executemany(
+                    "INSERT OR IGNORE INTO article_tag (article_id, tag) VALUES (?,?)",
+                    [(r["id"], t) for t in tags])
+                n += 1
+    return n
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="etl.run", description="Cobalt ingest")
     parser.add_argument("--section", default="all", choices=["all", *SECTIONS])
+    parser.add_argument("--retag", action="store_true",
+                        help="re-apply tags to stored headlines and exit")
     args = parser.parse_args(argv)
+
+    if args.retag:
+        print(f"re-tagged {retag()} headlines")
+        return 0
 
     r = ingest(args.section)
     print(f"section={r['section']} written={r['written']} documents={r['documents']}")

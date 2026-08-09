@@ -69,12 +69,7 @@
   </li>
   {%- endfor %}
   {%- else %}
-  {%- for s in p['items'] %}
-  <li class="story placeholder">
-    <a class="headline" href="#">Headline text appears here, linking to the source</a>
-    <div class="byline">{% if s.tag %}<span class="tag {{ s.tag_class }}">{{ s.tag|safe }}</span> &middot; {% endif %}source &middot; &mdash;</div>
-  </li>
-  {%- endfor %}
+  <li class="story"><span class="meta">Nothing in the current feeds matches what this page tracks.</span></li>
   {%- endif %}
 </ul>
 {%- elif p.type == 'chart' %}
