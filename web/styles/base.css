@@ -63,18 +63,41 @@ hr {
   margin: 24px 0;
 }
 
-.meta {
+/* Cross-cutting primitives.
+   Three patterns recur in every component — muted italic annotations,
+   monospace figures, chromeless buttons. Declared once here so the component
+   files state only what differs, usually just a size. */
+
+.meta, .crumb, .source-note, .metric-period,
+.region, .unit, .byline, .chart-span {
   color: var(--muted);
-  font-size: 15px;
   font-style: italic;
+}
+
+.metric-value, .metric-change, .quotes td, .ticker,
+.chart-axis, .chart-readout, .chart-span {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.ask, .refresh, .theme-toggle,
+.chart-range button, .chart-pick button {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.meta {
+  font-size: 15px;
 }
 
 /* trailing note under a table or list — source, caveat, empty state */
 
 .source-note {
   font-size: 14px;
-  font-style: italic;
-  color: var(--muted);
   margin-top: 14px;
 }
 
@@ -82,8 +105,6 @@ hr {
 
 .crumb {
   font-size: 14px;
-  font-style: italic;
-  color: var(--muted);
   margin: 0 0 16px 0;
 }
 
@@ -118,13 +139,9 @@ body {
   position: absolute;
   top: 44px;
   right: 40px;
-  background: none;
-  border: none;
   padding: 6px;
-  margin: 0;
   line-height: 0;
   color: var(--text);
-  cursor: pointer;
   display: flex;
 }
 

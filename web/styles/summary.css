@@ -21,13 +21,10 @@
 }
 
 .ask {
-  font: inherit;
   font-size: 15px;
-  background: none;
   border: 1px solid var(--rule);
   color: var(--text);
   padding: 5px 13px;
-  cursor: pointer;
 }
 
 .ask:hover {

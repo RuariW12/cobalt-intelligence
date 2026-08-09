@@ -7,11 +7,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ page.title|safe }}{% if page.section != 'home' %} &middot; cobalt{% endif %}</title>
-<link rel="stylesheet" href="/styles/main.css">
-<script src="/scripts/theme.js"></script>
-<script src="/scripts/main.js" defer></script>
+{%- for href in styles %}
+<link rel="stylesheet" href="{{ href }}">
+{%- endfor %}
+<script src="{{ scripts.theme }}"></script>
+<script src="{{ scripts.main }}" defer></script>
 {%- if page.has_chart %}
-<script src="/scripts/chart.js" defer></script>
+<script src="{{ scripts.chart }}" defer></script>
 {%- endif %}
 </head>
 <body data-section="{{ page.section }}">

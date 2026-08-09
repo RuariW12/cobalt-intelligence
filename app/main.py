@@ -34,6 +34,39 @@ OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:9b")
 
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
+# Stylesheets in cascade order. Linked individually rather than chained through
+# a manifest of @imports: the browser revalidates the manifest, sees the same
+# @import URLs and serves the imported files from cache, so a CSS edit stays
+# invisible until a hard refresh. Separate links each carry their own version.
+#
+#   tokens    palette and type faces; the only literal colours
+#   base      page frame, centred column, typography, breadcrumb, theme toggle
+#   masthead  title row, refresh icon and its spin animation
+#   summary   llm panel, ask button, three-dot loader
+#   news      headlines and section tags
+#   markets   metric rows and quote tables
+#   chart     svg line charts and their controls
+STYLESHEETS = ("tokens", "base", "masthead", "summary", "news", "markets", "chart")
+SCRIPTS = ("theme", "main", "chart")
+
+
+def _assets() -> dict:
+    """Versioned asset URLs.
+
+    The version is the newest mtime across the assets, so any edit changes every
+    URL and the browser cannot serve a stale file — no hard refresh, ever.
+    """
+    paths = [WEB_ROOT / "styles" / f"{n}.css" for n in STYLESHEETS]
+    paths += [WEB_ROOT / "scripts" / f"{n}.js" for n in SCRIPTS]
+    try:
+        version = int(max(p.stat().st_mtime for p in paths))
+    except OSError:
+        version = 0
+    return {
+        "styles": [f"/styles/{n}.css?v={version}" for n in STYLESHEETS],
+        "scripts": {n: f"/scripts/{n}.js?v={version}" for n in SCRIPTS},
+    }
+
 db.init()
 
 app = FastAPI(title="cobalt", docs_url="/api/docs", redoc_url=None)
@@ -189,8 +222,25 @@ def _series_payload(key: str, inst, rng: str, points: list) -> dict:
 # Mounted individually rather than at "/", so only these two directories are
 # public and the page routes below stay reachable.
 
-app.mount("/styles", StaticFiles(directory=WEB_ROOT / "styles"), name="styles")
-app.mount("/scripts", StaticFiles(directory=WEB_ROOT / "scripts"), name="scripts")
+class RevalidatingStatic(StaticFiles):
+    """Serve assets with `Cache-Control: no-cache`.
+
+    Not "do not cache" — the browser still stores the file, but must revalidate
+    before reuse, so an edit shows up on an ordinary reload. Without this,
+    stylesheets pulled in through main.css's @import chain are especially
+    sticky: the browser revalidates main.css, sees the same @import URLs, and
+    serves the imported files straight from cache. Editing base.css then has no
+    visible effect until a hard refresh, which looks exactly like a CSS bug.
+    """
+
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
+app.mount("/styles", RevalidatingStatic(directory=WEB_ROOT / "styles"), name="styles")
+app.mount("/scripts", RevalidatingStatic(directory=WEB_ROOT / "scripts"), name="scripts")
 
 
 # --- pages -----------------------------------------------------------------
@@ -199,7 +249,8 @@ def _render(request: Request, slug: str) -> HTMLResponse:
     page = render.build(slug)
     if page is None:
         return HTMLResponse("<h1>404</h1><p>No such page.</p>", status_code=404)
-    return templates.TemplateResponse(request, "page.html", {"page": page})
+    return templates.TemplateResponse(request, "page.html",
+                                     {"page": page, **_assets()})
 
 
 @app.get("/", response_class=HTMLResponse)
