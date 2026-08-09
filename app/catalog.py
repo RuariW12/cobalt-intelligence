@@ -1381,12 +1381,12 @@ PAGES = {'': {'title': 'cobalt',
                                         'selling your data.'},
                                {'type': 'links',
                                 'heading': 'code',
-                                'items': [{'href': 'https://github.com/RuariW12/cobalt',
+                                'items': [{'href': 'https://github.com/RuariW12/cobalt-intelligence',
                                            'label': 'github'},
                                           {'href': '/sections/about/setup',
                                            'label': 'setup guide',
                                            'meta': 'step by step, from scratch'},
-                                          {'href': 'https://github.com/RuariW12/cobalt/blob/main/LICENSE',
+                                          {'href': 'https://github.com/RuariW12/cobalt-intelligence/blob/main/LICENSE',
                                            'label': 'MIT licence',
                                            'meta': 'free to use and change'}]},
                                {'type': 'note',
@@ -1449,7 +1449,7 @@ PAGES = {'': {'title': 'cobalt',
                                 'heading': 'contact',
                                 'items': [{'href': 'mailto:ruariw16@gmail.com',
                                            'label': 'ruariw16@gmail.com'},
-                                          {'href': 'https://github.com/RuariW12/cobalt/issues',
+                                          {'href': 'https://github.com/RuariW12/cobalt-intelligence/issues',
                                            'label': 'issues',
                                            'meta': 'bugs and requests'}]}]},
  'sections/about/setup': {'title': 'setup',
@@ -1498,7 +1498,7 @@ PAGES = {'': {'title': 'cobalt',
                                      {'type': 'steps',
                                       'heading': '2. get the code',
                                       'items': ['<code>git clone '
-                                                'https://github.com/RuariW12/cobalt</code>',
+                                                'https://github.com/RuariW12/cobalt-intelligence</code>',
                                                 '<code>cd cobalt</code>']},
                                      {'type': 'steps',
                                       'heading': '3. add a FRED key (optional)',
@@ -1601,7 +1601,7 @@ PAGES = {'': {'title': 'cobalt',
                                                 'see the date the figure belongs to; stale rows '
                                                 'are greyed with a red tick.',
                                                 '<strong>Still stuck?</strong> <a '
-                                                'href="https://github.com/RuariW12/cobalt/issues">Open '
+                                                'href="https://github.com/RuariW12/cobalt-intelligence/issues">Open '
                                                 'an issue</a> with what you ran and what you '
                                                 'saw.']}]}}
 

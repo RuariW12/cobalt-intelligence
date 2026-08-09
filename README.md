@@ -13,8 +13,8 @@ Everything runs on your own machine. No accounts, no cloud, no telemetry.
 Requires [Docker](https://docs.docker.com/get-docker/) with Compose v2.
 
 ```sh
-git clone <your-repo-url> cobalt
-cd cobalt
+git clone https://github.com/RuariW12/cobalt-intelligence
+cd cobalt-intelligence
 cp .env.example .env      # optional for now; needed once the ETL lands
 ./cobalt-start.sh
 ```
