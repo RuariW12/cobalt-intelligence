@@ -22,8 +22,14 @@ services:
       - "${COBALT_PORT:-5173}:8000"
     volumes:
       - cobalt-data:/data
-      # Edit pages without rebuilding. Drop this line for a sealed deployment.
+      # Edit the frontend without rebuilding. Templates are mounted too:
+      # Jinja reloads them from disk, and having web/ live while templates
+      # were baked into the image meant a template change and a JS change
+      # could silently disagree until the next rebuild.
+      # Python code still needs a restart — uvicorn runs without --reload.
+      # Drop both lines for a sealed deployment.
       - ../web:/app/web:ro
+      - ../app/templates:/app/app/templates:ro
     environment:
       COBALT_DB: /data/cobalt.db
       TZ: ${TZ:-UTC}
