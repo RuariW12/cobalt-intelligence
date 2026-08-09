@@ -21,10 +21,40 @@ from store import tags as tagging
 from store.catalog_sync import sync as sync_instruments
 
 # Series computed from other observations rather than fetched.
-DERIVED = {
-    "gold-silver-ratio": ("GC=F", "SI=F", lambda a, b: a / b if b else None),
-    "brent-wti-spread": ("BZ=F", "CL=F", lambda a, b: a - b),
+#
+# Each entry names its inputs and how to combine them. `field` selects which
+# part of the input observation to use: "value" for a price, "ytd_pct" for a
+# year-to-date spread.
+DERIVED: dict[str, dict] = {
+    "gold-silver-ratio": {
+        "inputs": ("GC=F", "SI=F"), "field": "value",
+        "fn": lambda a, b: (a / b) if b else None,
+    },
+    "brent-wti-spread": {
+        "inputs": ("BZ=F", "CL=F"), "field": "value",
+        "fn": lambda a, b: a - b,
+    },
+    "qqq-iwm-ytd": {
+        "inputs": ("QQQ", "IWM"), "field": "ytd_pct",
+        "fn": lambda a, b: a - b,
+    },
+    "spy-rsp-ytd": {
+        "inputs": ("SPY", "RSP"), "field": "ytd_pct",
+        "fn": lambda a, b: a - b,
+    },
 }
+
+# Fetched only to feed a derived series — they appear on no page. SPY and RSP
+# are the cap-weighted and equal-weighted S&P; their YTD gap is the
+# concentration measure the AI-bubble page is built around.
+EXTRA_INPUTS = ("SPY", "RSP")
+
+# Declared in the catalog but deliberately not computed:
+#   nvda-sp500-weight, sp500-top10-weight  need index constituent weights.
+#     The iShares holdings CSV now returns a consent page rather than a file,
+#     so there is no free source wired up. Left empty rather than approximated.
+#   ndx-trailing-pe  needs per-constituent earnings; forward P/E is licensed.
+UNIMPLEMENTED = ("nvda-sp500-weight", "sp500-top10-weight", "ndx-trailing-pe")
 
 
 def targets(section: str) -> tuple[list[str], list[str]]:
@@ -40,26 +70,50 @@ def targets(section: str) -> tuple[list[str], list[str]]:
                     symbols.append(row["symbol"])
                 if row.get("series"):
                     series.append(row["series"])
+    # Inputs that feed derived series but appear on no page.
+    if section in ("all", "home", "etfs", "ai-bubble"):
+        symbols.extend(EXTRA_INPUTS)
     return sorted(set(symbols)), sorted(set(series))
 
 
-def compute_derived(now: str) -> list[dict]:
+def compute_derived() -> list[dict]:
+    """Build derived observations from what is already stored.
+
+    Dating matters: a derived value belongs to the day of its inputs, not to
+    the moment it was computed. Stamping it with "now" made the gold/silver
+    ratio appear a day newer than the gold and silver it comes from.
+    """
     latest = db.latest()
     out = []
-    for name, (a_key, b_key, fn) in DERIVED.items():
+    for name, spec in DERIVED.items():
+        a_key, b_key = spec["inputs"]
         a, b = latest.get(("symbol", a_key)), latest.get(("symbol", b_key))
         if not a or not b:
             continue
+
+        field = spec["field"]
         try:
-            value = fn(a["value"], b["value"])
-        except Exception:
+            value = spec["fn"](a[field], b[field])
+        except (TypeError, KeyError, ZeroDivisionError):
             continue
         if value is None:
             continue
+
+        # The same function over the inputs' own previous values gives a real
+        # change, without needing stored history.
+        previous = None
+        if field == "value" and a["previous"] is not None and b["previous"] is not None:
+            try:
+                previous = spec["fn"](a["previous"], b["previous"])
+            except (TypeError, ZeroDivisionError):
+                previous = None
+
+        as_of = min(a["as_of"], b["as_of"])
+        now = datetime.now(timezone.utc).isoformat(timespec="seconds")
         out.append({
-            "kind": "derived", "key": name, "ts": now, "value": value,
-            "previous": None, "change": None, "pct": None, "currency": None,
-            "source": "derived", "fetched_at": now,
+            "kind": "derived", "key": name, "ts": as_of, "value": value,
+            "previous": previous, "change": None, "pct": None, "ytd_pct": None,
+            "currency": None, "source": "derived", "fetched_at": now,
         })
     return out
 
@@ -127,7 +181,7 @@ def ingest(section: str = "all") -> dict:
             result["sources"]["fred"] = {"requested": len(series), "written": written,
                                          "failed": len(failed), "suspect": suspect}
 
-    derived = compute_derived(datetime.now(timezone.utc).isoformat(timespec="seconds"))
+    derived = compute_derived()
     if derived:
         written, _, docs = store_rows(derived, insts)
         result["written"] += written

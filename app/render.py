@@ -19,7 +19,14 @@ COLUMN_FIELD = {
     "price": "value", "level": "value",
     "change": "change", "24h": "change",
     "%": "pct",
+    "ytd": "ytd_pct",
 }
+
+# How old a reading may be before the page says so. A price that stopped
+# updating still renders, and without a marker yesterday's number reads as
+# today's — worse than a gap. Macro releases are monthly by nature, so they
+# get a far longer leash.
+STALE_AFTER_DAYS = {"symbol": 4, "derived": 4, "series": 70}
 
 DASH = "&mdash;"
 
@@ -49,7 +56,21 @@ def _cell(field: str, obs) -> tuple[str, str | None]:
         return _signed(obs["change"])
     if field == "pct":
         return _signed(obs["pct"], "%")
+    if field == "ytd_pct":
+        return _signed(obs["ytd_pct"], "%")
     return DASH, None
+
+
+def _age(obs) -> tuple[str | None, bool]:
+    """(as_of, is_stale) for a stored observation."""
+    if obs is None:
+        return None, False
+    try:
+        age = (datetime.now(timezone.utc).date()
+               - datetime.fromisoformat(obs["as_of"]).date()).days
+    except (ValueError, TypeError):
+        return obs["as_of"], False
+    return obs["as_of"], age > STALE_AFTER_DAYS.get(obs["kind"], 4)
 
 
 def build(slug: str) -> dict | None:
@@ -77,6 +98,7 @@ def build(slug: str) -> dict | None:
                     cells.append({"text": text, "cls": cls})
                 row["cells"] = cells
                 row["has_data"] = obs is not None
+                row["as_of"], row["stale"] = _age(obs)
 
         elif panel["type"] == "metrics":
             for row in panel["rows"]:
@@ -90,6 +112,7 @@ def build(slug: str) -> dict | None:
                 row["change_text"], row["change_cls"] = (
                     _signed(obs["change"]) if obs else (DASH, None))
                 row["has_data"] = obs is not None
+                row["as_of"], row["stale"] = _age(obs)
 
     return page
 

@@ -35,6 +35,12 @@ def connect() -> Iterator[sqlite3.Connection]:
 def init() -> None:
     with connect() as conn:
         conn.executescript(SCHEMA_PATH.read_text())
+        # A crash mid-ingest leaves a run marked 'running' forever, which makes
+        # last_refresh() and any future health check lie. Reap them on startup.
+        conn.execute(
+            """UPDATE ingest_run SET status='error', error='interrupted',
+                   finished_at=datetime('now')
+               WHERE status='running' AND started_at < datetime('now','-1 hour')""")
 
 
 # --- instruments -----------------------------------------------------------
@@ -87,13 +93,14 @@ def write_observations(rows: Iterable[dict]) -> int:
     with connect() as conn:
         conn.executemany(
             """INSERT INTO observation
-                 (kind,key,as_of,ts,value,previous,change,pct,currency,quality,
+                 (kind,key,as_of,ts,value,previous,change,pct,ytd_pct,currency,quality,
                   source,fetched_at)
-               VALUES (:kind,:key,:as_of,:ts,:value,:previous,:change,:pct,:currency,
+               VALUES (:kind,:key,:as_of,:ts,:value,:previous,:change,:pct,:ytd_pct,:currency,
                        :quality,:source,:fetched_at)
                ON CONFLICT(kind,key,as_of) DO UPDATE SET
                  ts=excluded.ts, value=excluded.value, previous=excluded.previous,
-                 change=excluded.change, pct=excluded.pct, currency=excluded.currency,
+                 change=excluded.change, pct=excluded.pct, ytd_pct=excluded.ytd_pct,
+                 currency=excluded.currency,
                  quality=excluded.quality, source=excluded.source,
                  fetched_at=excluded.fetched_at""",
             rows,

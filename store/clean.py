@@ -91,6 +91,8 @@ def observation(row: dict, asset_class: str = "") -> dict | None:
         "previous": round(previous, 6) if previous is not None else None,
         "change": round(change, 6) if change is not None else None,
         "pct": round(pct, 4) if pct is not None else None,
+        "ytd_pct": (round(_f(row.get("ytd_pct")), 4)
+                    if _f(row.get("ytd_pct")) is not None else None),
         "currency": (row.get("currency") or None),
         "quality": quality,
         "source": row["source"],

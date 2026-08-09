@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS observation (
     previous    REAL,
     change      REAL,
     pct         REAL,
+    ytd_pct     REAL,          -- % change since the first close of the year
     currency    TEXT,
     quality     TEXT NOT NULL DEFAULT 'ok',   -- ok | suspect
     source      TEXT NOT NULL,

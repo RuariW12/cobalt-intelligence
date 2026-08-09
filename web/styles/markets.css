@@ -137,3 +137,19 @@
 
 .session.open   { background: var(--up); }
 .session.closed { background: var(--muted); }
+
+/* A reading older than its cadence allows. Rendered, not hidden — but visibly
+   not current, so a stalled feed cannot pass for today's number. The row's
+   title attribute carries the actual observation date. */
+
+.quotes tr.stale td,
+.metric.stale .metric-value,
+.metric.stale .metric-change {
+  color: var(--muted);
+}
+
+.quotes tr.stale td:first-child::after,
+.metric.stale .metric-name::after {
+  content: " ·";
+  color: var(--down);
+}

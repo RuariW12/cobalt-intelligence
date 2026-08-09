@@ -19,7 +19,8 @@
 {%- elif p.type == 'metrics' %}
 <ul class="metrics">
   {%- for r in p.rows %}
-  <li class="metric{% if not r.has_data %} placeholder{% endif %}"
+  <li class="metric{% if not r.has_data %} placeholder{% endif %}{% if r.stale %} stale{% endif %}"
+      {%- if r.as_of %} title="as of {{ r.as_of }}"{% endif %}
       {%- if r.series %} data-series="{{ r.series }}"{% endif %}
       {%- if r.derived %} data-derived="{{ r.derived }}"{% endif %}
       {%- if r.manual %} data-manual="{{ r.manual }}"{% endif %}
@@ -42,7 +43,9 @@
   </thead>
   <tbody>
     {%- for r in p.rows %}
-    <tr class="{% if not r.has_data %}placeholder{% endif %}"{% if r.symbol %} data-symbol="{{ r.symbol }}"{% endif %}>
+    <tr class="{% if not r.has_data %}placeholder{% endif %}{% if r.stale %} stale{% endif %}"
+        {%- if r.as_of %} title="as of {{ r.as_of }}"{% endif %}
+        {%- if r.symbol %} data-symbol="{{ r.symbol }}"{% endif %}>
       <td>{% if r.session %}<span class="session"></span>{% endif %}{{ r.name|safe }}
           {%- if r.unit %} <span class="unit">{{ r.unit|safe }}</span>{% endif %}
           {%- if r.region %} <span class="region">{{ r.region|safe }}</span>{% endif %}</td>

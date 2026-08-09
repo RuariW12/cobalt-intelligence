@@ -60,6 +60,8 @@ def sentence(inst: dict, obs: dict) -> str:
     else:
         head += ", no prior reading to compare"
 
+    if obs.get("ytd_pct") is not None:
+        head += f"; {_signed(obs['ytd_pct'], '%')} year to date"
     if inst.get("period"):
         head += f" [{inst['period']}]"
     if obs.get("quality") == "suspect":
