@@ -36,7 +36,6 @@ observe live in `updated-context.md` — that file is the source of truth for
 - **ETFs** — broad market, international, materials & commodities.
 - **Trackers** — AI bubble tracker (market activity for key AI players plus
   relevant AI news), bitcoin.
-- **Relationships** — the causal chains listed in `updated-context.md`.
 
 ## Ollama integration (deferred — not now)
 

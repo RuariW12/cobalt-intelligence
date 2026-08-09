@@ -25,8 +25,7 @@ cobalt/
 29 pages, all from the catalog: home; news (+politics, economics, tech); macro
 (+inflation, labor, growth); rates (+treasuries, credit); indexes (+us,
 international); commodities; companies (+tech, industrial, energy, financials,
-consumer); etfs (+broad, international, materials); ai-bubble; bitcoin;
-relationships.
+consumer); etfs (+broad, international, materials); ai-bubble; bitcoin.
 
 URLs are unchanged from the static version, and both `/sections/macro` and
 `/sections/macro/` resolve without a redirect.
@@ -34,9 +33,8 @@ URLs are unchanged from the static version, and both `/sections/macro` and
 ## Conventions in the markup
 
 - Chrome (crumb, h1, masthead, summary panel) lives in `base.html` only.
-  Only `/sections/relationships` omits the refresh — it ingests nothing.
 - Content components: `.metric` rows (one figure + change), `.quotes` tables
-  (several numeric columns), `.stories` (headlines), `.chain` (relationships).
+  (several numeric columns), `.stories` (headlines).
 - Skeleton rows carry `.placeholder`, which dims them to `--skeleton`. Removing
   that class is what makes a row look live.
 

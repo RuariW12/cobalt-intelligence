@@ -66,25 +66,6 @@
   </li>
   {%- endfor %}
 </ul>
-{%- elif p.type == 'chains' %}
-{%- for c in p.chains %}
-<div class="chain">
-  <div class="chain-links">
-    {%- for n in c.nodes %}
-    {%- if n.sep %}
-    <span class="arrow">{{ n.sep|safe }}</span>
-    {%- elif n.href %}
-    <a href="{{ n.href }}">{{ n.label|safe }}</a>
-    {%- else %}
-    <span class="node-untracked">{{ n.label|safe }}</span>
-    {%- endif %}
-    {%- endfor %}
-  </div>
-  {%- if c.note %}
-  <p class="chain-note">{{ c.note|safe }}</p>
-  {%- endif %}
-</div>
-{%- endfor %}
 {%- elif p.type == 'note' %}
 <p class="{{ p.style if p.style else 'source-note' }}">{{ p.text|safe }}</p>
 {%- endif %}

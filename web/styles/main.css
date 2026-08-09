@@ -16,7 +16,6 @@
      markets         metric rows, quote tables -> macro, rates, indexes,
                                                   commodities, companies,
                                                   etfs, trackers
-     relationships   causal chains             -> /sections/relationships
 */
 
 @import url("tokens.css");
@@ -25,4 +24,3 @@
 @import url("summary.css");
 @import url("news.css");
 @import url("markets.css");
-@import url("relationships.css");
