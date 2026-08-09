@@ -225,6 +225,49 @@ def ingest(section: str = "all") -> dict:
     return result
 
 
+def backfill(since: str | None = None) -> dict:
+    """Load every FRED series to inception.
+
+    Run once. The daily ingest deliberately asks for only the last two values
+    of each series, which is all the dashboard renders — but it means the
+    archive starts empty. This fills in the past so there is something to look
+    back at, and so a chart of CPI covers more than a fortnight.
+
+    Observations only: writing a document per historical point would add tens
+    of thousands of rows to the model's retrieval surface, all of them stale by
+    definition. The latest value of each series already has its document.
+    """
+    db.init()
+    sync_instruments()
+    insts = db.instruments()
+
+    _, series_ids = targets("all")
+    if not fred.available():
+        return {"error": "FRED_API_KEY not set"}
+
+    started = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    run_id = db.start_run("all", "fred-backfill", started)
+
+    rows, failed = fred.history(series_ids, since=since)
+    cleaned = []
+    for row in rows:
+        inst = insts.get(row["key"])
+        obs = clean.observation(row, inst["asset_class"] if inst else "")
+        if obs:
+            cleaned.append(obs)
+    written = db.write_observations(cleaned)
+
+    db.finish_run(run_id, datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                  "ok" if not failed else "partial", written,
+                  ", ".join(failed) or None)
+
+    by_series = {}
+    for o in cleaned:
+        by_series[o["key"]] = by_series.get(o["key"], 0) + 1
+    return {"series": len(series_ids), "written": written,
+            "failed": failed, "per_series": by_series}
+
+
 def retag() -> int:
     """Re-apply the tag vocabulary to every stored headline.
 
@@ -254,10 +297,26 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--section", default="all", choices=["all", *SECTIONS])
     parser.add_argument("--retag", action="store_true",
                         help="re-apply tags to stored headlines and exit")
+    parser.add_argument("--backfill", action="store_true",
+                        help="load every FRED series to inception and exit")
+    parser.add_argument("--since", metavar="YYYY-MM-DD",
+                        help="with --backfill, do not go back further than this")
     args = parser.parse_args(argv)
 
     if args.retag:
         print(f"re-tagged {retag()} headlines")
+        return 0
+
+    if args.backfill:
+        r = backfill(args.since)
+        if "error" in r:
+            print(r["error"], file=sys.stderr)
+            return 1
+        print(f"backfilled {r['written']} observations across {r['series']} series")
+        for key, n in sorted(r["per_series"].items(), key=lambda kv: -kv[1]):
+            print(f"  {key:16} {n}")
+        if r["failed"]:
+            print("  failed:", ", ".join(r["failed"]), file=sys.stderr)
         return 0
 
     r = ingest(args.section)

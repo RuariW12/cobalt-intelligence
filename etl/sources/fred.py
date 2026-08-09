@@ -63,6 +63,66 @@ def available() -> bool:
     return bool(os.environ.get("FRED_API_KEY"))
 
 
+def _observations(client, sid: str, key: str, *, limit: int | None,
+                  since: str | None = None) -> list[dict]:
+    """Raw observations for one series, oldest first, with the right transform."""
+    params = {
+        "series_id": sid, "api_key": key, "file_type": "json",
+        "sort_order": "asc",
+    }
+    if sid in TRANSFORMS:
+        params["units"] = TRANSFORMS[sid][0]
+    if since:
+        params["observation_start"] = since
+    if limit:
+        params["sort_order"] = "desc"
+        params["limit"] = limit
+    r = client.get(OBS, params=params)
+    r.raise_for_status()
+    obs = [o for o in r.json().get("observations", []) if o.get("value") not in (".", None)]
+    return list(reversed(obs)) if limit else obs
+
+
+def history(series_ids: list[str], since: str | None = None,
+            timeout: float = 60.0) -> tuple[list[dict], list[str]]:
+    """Every observation FRED holds for these series.
+
+    The daily refresh asks for the last two values, which is all a dashboard
+    needs but leaves no past to look at. This fetches the series to inception
+    so the archive has something in it. Meant to be run once, not per refresh —
+    a treasury series is sixteen thousand points and none of them change.
+    """
+    api_key = os.environ.get("FRED_API_KEY")
+    if not api_key:
+        return [], list(series_ids)
+
+    out: list[dict] = []
+    failed: list[str] = []
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+    with httpx.Client(timeout=timeout) as client:
+        for sid in series_ids:
+            try:
+                obs = _observations(client, sid, api_key, limit=None, since=since)
+            except Exception:
+                failed.append(sid)
+                continue
+            previous = None
+            for o in obs:
+                try:
+                    value = float(o["value"])
+                except (TypeError, ValueError):
+                    continue
+                out.append({
+                    "kind": "series", "key": sid, "ts": o["date"],
+                    "value": value, "previous": previous,
+                    "change": None, "pct": None, "ytd_pct": None, "currency": None,
+                    "source": "fred", "fetched_at": now,
+                })
+                previous = value
+    return out, failed
+
+
 def fetch(series_ids: list[str], timeout: float = 20.0) -> tuple[list[dict], list[str]]:
     key = os.environ.get("FRED_API_KEY")
     if not key:
