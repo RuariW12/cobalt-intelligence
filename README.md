@@ -71,23 +71,27 @@ tracker without being filed twice.
 
 ## Screenshots
 
-> Placeholders for now. Drop images into `docs/screenshots/` to fill them in.
-
-**Home**
+**The index.** Every section, and what each one covers.
 
 ![Home page](docs/screenshots/home.png)
 
-**A section page: prices, chart, and headlines matched to what it tracks**
+**News.** One combined feed plus a page per topic, balanced so no single
+publisher can crowd out the rest. Every headline links to its source.
+
+![News](docs/screenshots/news.png)
+
+**Commodities.** Prices with their units, the day's move, and year to date.
+Derived rows like the gold/silver ratio are computed locally. What cannot be
+priced for free is listed as such rather than guessed at.
 
 ![Commodities](docs/screenshots/commodities.png)
 
-**A generated summary**
+**AI bubble tracker.** Built around concentration rather than price, and
+organised as the money flows: chips, then the hyperscalers buying them, then
+the buildout and the power it needs. Empty rows are measures with no free
+source, left visible instead of filled in.
 
-![Summary](docs/screenshots/summary.png)
-
-**Day mode**
-
-![Day mode](docs/screenshots/day-mode.png)
+![AI bubble tracker](docs/screenshots/ai-bubble.png)
 
 ---
 
