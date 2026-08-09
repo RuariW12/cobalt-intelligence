@@ -16,18 +16,18 @@ Requires [Docker](https://docs.docker.com/get-docker/) with Compose v2.
 git clone <your-repo-url> cobalt
 cd cobalt
 cp .env.example .env      # optional for now; needed once the ETL lands
-./start.sh
+./cobalt-start.sh
 ```
 
-Open <http://localhost:5173>. Stop with `./stop.sh` — your data is in a named
+Open <http://localhost:5173>. Stop with `./cobalt-stop.sh` — your data is in a named
 volume and survives.
 
 ```sh
-./start.sh              app only
-./start.sh --llm        + the local model server
-./start.sh --gpu --llm  + the model server on an NVIDIA GPU
-./stop.sh               stop everything, keep data
-./stop.sh --wipe        also delete the database and model weights
+./cobalt-start.sh              app only
+./cobalt-start.sh --llm        + the local model server
+./cobalt-start.sh --gpu --llm  + the model server on an NVIDIA GPU
+./cobalt-stop.sh               stop everything, keep data
+./cobalt-stop.sh --wipe        also delete the database and model weights
 ```
 
 If port 5173 is taken, set `COBALT_PORT` in `.env`.
@@ -36,7 +36,7 @@ If port 5173 is taken, set `COBALT_PORT` in `.env`.
 
 A kill switch that drops non-tunnel traffic (Mullvad, ProtonVPN and similar)
 breaks Docker's bridge network — builds fail to reach PyPI and published ports
-refuse connections even though the container is healthy. `./start.sh` detects
+refuse connections even though the container is healthy. `./cobalt-start.sh` detects
 this and switches to host networking automatically.
 
 The cleaner fix, which keeps the portable setup everyone else uses:
@@ -50,7 +50,7 @@ mullvad lan set allow
 ## Running the local LLM
 
 ```sh
-./start.sh --llm
+./cobalt-start.sh --llm
 ```
 
 That checks Ollama is up (starting the service if not), builds the **cobalt**
@@ -81,13 +81,13 @@ Install Ollama from <https://ollama.com>, then pull the base model:
 ollama pull qwen3.5:9b          # or set OLLAMA_BASE_MODEL
 ```
 
-To run it in Docker anyway: `./start.sh --container-ollama` — and read the GPU
+To run it in Docker anyway: `./cobalt-start.sh --container-ollama` — and read the GPU
 section below first, or it will be CPU-only.
 
 ### Configuration
 
 `config/ollama/Modelfile` defines the **cobalt** model: context window, sampling
-parameters and system prompt, version-controlled in the repo. `./start.sh --llm`
+parameters and system prompt, version-controlled in the repo. `./cobalt-start.sh --llm`
 rebuilds it every run, which is cheap — it is a manifest over weights already on
 disk, not another copy.
 
@@ -110,7 +110,7 @@ Two settings matter more than the rest:
 ## Using an NVIDIA GPU
 
 **Only needed if you run Ollama in a container** (`--container-ollama`). With
-the default host-native Ollama the GPU already works, and `./start.sh --llm`
+the default host-native Ollama the GPU already works, and `./cobalt-start.sh --llm`
 prints `processor -> 100% GPU` to prove it.
 
 Docker cannot see your GPU by default. Without the steps below the container
@@ -146,7 +146,7 @@ Your GPU should be listed. If this fails, nothing below will work.
 ### 3. Start with the GPU overlay
 
 ```sh
-./start.sh --gpu --llm
+./cobalt-start.sh --gpu --llm
 ```
 
 ### 4. Confirm the model is actually on the GPU
@@ -201,7 +201,7 @@ the `cobalt-data` volume that `web` and `etl` share. If this ever needs
 concurrent writers or network access, that is when Postgres becomes a container.
 
 ```
-start.sh stop.sh   the supported way to run it
+cobalt-start.sh cobalt-stop.sh   the supported way to run it
 config/ollama/     Modelfile defining the "cobalt" model
 app/               FastAPI service
 etl/               ingest pipeline (stub)
@@ -252,12 +252,12 @@ docker run --rm -v cobalt_cobalt-data:/d -v "$PWD":/b alpine \
 ## Troubleshooting
 
 **`pip` fails during build with a DNS error.** Usually a VPN kill switch (see
-*Behind a VPN* above) — `./start.sh` handles it. Otherwise your daemon has no
+*Behind a VPN* above) — `./cobalt-start.sh` handles it. Otherwise your daemon has no
 working DNS: add `{"dns": ["1.1.1.1"]}` to `/etc/docker/daemon.json` and
 restart Docker.
 
 **Port already in use.** Set `COBALT_PORT` in `.env`, or find the holder with
-`ss -ltnp | grep 5173`. `./start.sh` names the holder for you.
+`ss -ltnp | grep 5173`. `./cobalt-start.sh` names the holder for you.
 
 **Pages 404 but `/api/health` works.** The `web/` directory didn't make it into
 the image. Rebuild with `docker compose build --no-cache web`.

@@ -98,7 +98,12 @@ PAGES = {'': {'title': 'cobalt',
                  {'type': 'links',
                   'heading': 'trackers',
                   'items': [{'href': '/sections/ai-bubble', 'label': 'ai bubble tracker'},
-                            {'href': '/sections/bitcoin', 'label': 'bitcoin'}]}]},
+                            {'href': '/sections/bitcoin', 'label': 'bitcoin'}]},
+                 {'type': 'links',
+                  'heading': 'about',
+                  'items': [{'href': '/sections/about',
+                             'label': 'about this site',
+                             'meta': 'sources, licence, and how to run your own'}]}]},
  'sections/ai-bubble': {'title': 'ai bubble tracker',
                         'h1': 'AI Bubble Tracker',
                         'accent': 'violet',
@@ -1347,7 +1352,126 @@ PAGES = {'': {'title': 'cobalt',
                                            'text': 'Source and release date appear here.'},
                                           {'type': 'stories',
                                            'heading': 'related headlines',
-                                           'items': [{}, {}]}]}}
+                                           'items': [{}, {}]}]},
+ 'sections/about': {'title': 'about',
+                    'h1': 'About',
+                    'section': 'about',
+                    'show_refreshed': False,
+                    'crumb': [{'href': '/', 'label': 'cobalt'}, {'label': 'about'}],
+                    'refresh': False,
+                    'summarize': False,
+                    'panels': [{'type': 'note',
+                                'text': 'Cobalt is an open source market intelligence platform '
+                                        'designed to run on local hardware. It utilizes free &amp; '
+                                        "reliable API's &mdash; yfinance and FRED &mdash; to fetch "
+                                        'and store data. Additionally, there is local LLM '
+                                        'integration built in to simplify information into a '
+                                        'human-readable manner. Cobalt provides an extensive '
+                                        'overview of all things economics, as well as other news '
+                                        'like politics and technology. This app was designed to '
+                                        'create an easy, one stop place to stay informed on a '
+                                        'daily basis, without paying a subscription, and without '
+                                        'selling your data.'},
+                               {'type': 'links',
+                                'heading': 'code',
+                                'items': [{'href': 'https://github.com/RuariW12/cobalt',
+                                           'label': 'github'},
+                                          {'href': 'https://github.com/RuariW12/cobalt#readme',
+                                           'label': 'setup guide',
+                                           'meta': 'install and troubleshooting'},
+                                          {'href': 'https://github.com/RuariW12/cobalt/blob/main/LICENSE',
+                                           'label': 'MIT licence',
+                                           'meta': 'free to use and change'}]},
+                               {'type': 'steps',
+                                'heading': 'running it',
+                                'items': ['Install <a '
+                                          'href="https://docs.docker.com/get-docker/">Docker</a>.',
+                                          '<code>git clone '
+                                          'https://github.com/RuariW12/cobalt</code>',
+                                          '<code>./cobalt-start.sh</code>',
+                                          'Open <code>localhost:5173</code>.',
+                                          '<code>./cobalt-stop.sh</code> when you are done. Your '
+                                          'data is kept.']},
+                               {'type': 'steps',
+                                'heading': 'adding summaries',
+                                'items': ['Install <a '
+                                          'href="https://ollama.com/download">Ollama</a> on the '
+                                          'same machine. It is a one-line install on Linux: '
+                                          '<code>curl -fsSL https://ollama.com/install.sh | '
+                                          'sh</code>',
+                                          'Pull a model: <code>ollama pull qwen3.5:9b</code>. '
+                                          'Anything around 8&ndash;9B fits a 12GB GPU comfortably.',
+                                          '<code>./cobalt-start.sh --llm</code>. It builds the '
+                                          'settings from <code>config/ollama/Modelfile</code> and '
+                                          'tells you whether the model landed on your GPU.',
+                                          'Press <em>summarize</em> on any page.']},
+                               {'type': 'note',
+                                'text': 'The refresh icon next to a page title updates that page. '
+                                        'The one on the home page updates everything.'},
+                               {'type': 'links',
+                                'heading': 'prices and economic data',
+                                'items': [{'href': 'https://fred.stlouisfed.org',
+                                           'label': 'FRED',
+                                           'meta': 'economic series. Free key needed'},
+                                          {'href': 'https://finance.yahoo.com',
+                                           'label': 'Yahoo Finance',
+                                           'meta': 'prices. No key needed'}]},
+                               {'type': 'links',
+                                'heading': 'news',
+                                'items': [{'href': 'https://www.npr.org/sections/politics/',
+                                           'label': 'NPR',
+                                           'meta': 'politics'},
+                                          {'href': 'https://thehill.com',
+                                           'label': 'The Hill',
+                                           'meta': 'politics'},
+                                          {'href': 'https://www.politico.com',
+                                           'label': 'Politico',
+                                           'meta': 'politics'},
+                                          {'href': 'https://www.cnbc.com/economy/',
+                                           'label': 'CNBC',
+                                           'meta': 'economy'},
+                                          {'href': 'https://www.marketwatch.com',
+                                           'label': 'MarketWatch',
+                                           'meta': 'markets'},
+                                          {'href': 'https://www.bbc.co.uk/news/business',
+                                           'label': 'BBC Business',
+                                           'meta': 'economy'},
+                                          {'href': 'https://www.federalreserve.gov/newsevents/pressreleases.htm',
+                                           'label': 'Federal Reserve',
+                                           'meta': 'press releases'},
+                                          {'href': 'https://www.coindesk.com',
+                                           'label': 'CoinDesk',
+                                           'meta': 'crypto'},
+                                          {'href': 'https://decrypt.co',
+                                           'label': 'Decrypt',
+                                           'meta': 'crypto'},
+                                          {'href': 'https://arstechnica.com',
+                                           'label': 'Ars Technica',
+                                           'meta': 'tech'},
+                                          {'href': 'https://www.theverge.com',
+                                           'label': 'The Verge',
+                                           'meta': 'tech'},
+                                          {'href': 'https://phys.org',
+                                           'label': 'Phys.org',
+                                           'meta': 'science'},
+                                          {'href': 'https://news.ycombinator.com',
+                                           'label': 'Hacker News',
+                                           'meta': 'tech'}]},
+                               {'type': 'note',
+                                'text': "Headlines come from each site's RSS feed. Only the "
+                                        'headline and link are stored, never the article, so '
+                                        'everything links back to the source.'},
+                               {'type': 'links',
+                                'heading': 'contact',
+                                'items': [{'href': 'mailto:ruariw16@gmail.com',
+                                           'label': 'ruariw16@gmail.com'},
+                                          {'href': 'https://github.com/RuariW12/cobalt/issues',
+                                           'label': 'issues',
+                                           'meta': 'bugs and requests'}]},
+                               {'type': 'note',
+                                'style': 'disclaimer',
+                                'text': 'Not investment advice &mdash; the data comes from third '
+                                        'parties and can be wrong, late or revised.'}]}}
 
 
 SECTIONS = sorted({p['section'] for p in PAGES.values()})

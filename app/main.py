@@ -137,7 +137,7 @@ async def summarize(section: str = "home") -> JSONResponse:
         return JSONResponse(status_code=503, content={
             "error": "model unavailable",
             "detail": f"{exc.__class__.__name__} talking to {OLLAMA_URL}",
-            "hint": "start it with ./start.sh --llm",
+            "hint": "start it with ./cobalt-start.sh --llm",
         })
 
     return JSONResponse({

@@ -5,7 +5,7 @@ context window, sampling parameters and a system prompt over the base weights â€
 it does not copy them, so it adds no meaningful disk.
 
 ```sh
-ollama create cobalt -f config/ollama/Modelfile   # ./start.sh --llm does this
+ollama create cobalt -f config/ollama/Modelfile   # ./cobalt-start.sh --llm does this
 ollama show cobalt --modelfile                    # what is actually loaded
 ollama ps                                         # PROCESSOR must say 100% GPU
 ```
@@ -33,13 +33,13 @@ silently truncates the input.
 
 ## Changing the base model
 
-Edit the `FROM` line, then re-run `./start.sh --llm`. The name `cobalt` stays
+Edit the `FROM` line, then re-run `./cobalt-start.sh --llm`. The name `cobalt` stays
 the same, so nothing in the app needs to change.
 
 ## Running it in a container instead
 
 The default here assumes Ollama runs on the host, which is the sane choice when
 the host has an NVIDIA GPU: no container toolkit needed, and the weights are
-already downloaded. `./start.sh --llm --container-ollama` runs it in Docker
+already downloaded. `./cobalt-start.sh --llm --container-ollama` runs it in Docker
 instead â€” that path needs the NVIDIA Container Toolkit, or it silently falls
 back to CPU.

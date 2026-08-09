@@ -8,7 +8,7 @@ See README.md for how to run it. Layout:
 
 ```
 cobalt/
-  start.sh stop.sh        the supported entrypoints
+  cobalt-start.sh cobalt-stop.sh        the supported entrypoints
   docker/                 Dockerfile, compose.yml, compose.gpu.yml, compose.vpn.yml
   app/main.py             FastAPI: routes, stubs /api/refresh + /api/summarize
   app/catalog.py          THE source of truth: every page, panel and row

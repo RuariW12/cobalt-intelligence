@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Stop Cobalt.
 #
-#   ./stop.sh            stop and remove containers; data and models are kept
-#   ./stop.sh --wipe     also delete the volumes (database AND model weights)
+#   ./cobalt-stop.sh            stop and remove containers; data and models are kept
+#   ./cobalt-stop.sh --wipe     also delete the volumes (database AND model weights)
 #
 # Every overlay and profile is passed so nothing is left running, whichever
 # way it was started.

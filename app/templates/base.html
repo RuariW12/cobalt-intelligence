@@ -55,6 +55,7 @@
 {%- endif %}
 
 <h1{% if page.accent %} class="{{ page.accent }}"{% endif %}>{{ page.h1|safe }}</h1>
+{%- if page.tagline or page.show_refreshed or page.refresh %}
 <div class="masthead">
   <span class="meta">{{ page.tagline|safe }}
     {%- if page.show_refreshed %}{% if page.tagline %} &mdash; {% endif %}last refreshed:
@@ -69,6 +70,7 @@
   </button>
   {%- endif %}
 </div>
+{%- endif %}
 
 <hr>
 

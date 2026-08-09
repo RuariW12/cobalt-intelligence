@@ -1,4 +1,4 @@
-# Cobalt. Use ./start.sh and ./stop.sh rather than driving compose directly —
+# Cobalt. Use ./cobalt-start.sh and ./cobalt-stop.sh rather than driving compose directly —
 # they pick the right overlays and detect the VPN case. Equivalent by hand:
 #
 #   docker compose -f docker/compose.yml up -d

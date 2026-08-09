@@ -10,6 +10,7 @@
   --skeleton: #4e4e4e;    /* placeholder text, clearly not real content */
   --up: #7fc9a0;          /* positive change */
   --down: #e0796b;        /* negative change */
+  --warn: #f0705c;        /* disclaimers; louder than --down, same family */
 
   --mono: 'DejaVu Sans Mono', 'Liberation Mono', ui-monospace, monospace;
 
@@ -34,6 +35,7 @@
   --skeleton: #bab6b0;
   --up: #2e7d55;
   --down: #c0392b;
+  --warn: #c8362a;
 
   --clay: #b0563c;
   --green: #2e7d55;

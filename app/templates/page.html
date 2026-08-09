@@ -99,6 +99,12 @@
     <span class="chart-span meta"></span>
   </div>
 </div>
+{%- elif p.type == 'steps' %}
+<ol class="steps">
+  {%- for i in p['items'] %}
+  <li>{{ i|safe }}</li>
+  {%- endfor %}
+</ol>
 {%- elif p.type == 'note' %}
 <p class="{{ p.style if p.style else 'source-note' }}">{{ p.text|safe }}</p>
 {%- endif %}

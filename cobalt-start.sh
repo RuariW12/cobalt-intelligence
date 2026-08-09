@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Start Cobalt.
 #
-#   ./start.sh              app only
-#   ./start.sh --llm        app + the local model (host ollama by default)
-#   ./start.sh --gpu --llm  ollama on an NVIDIA GPU
-#   ./start.sh --container-ollama  run ollama in Docker instead of on the host
-#   ./start.sh --vpn        force host networking (auto-detected normally)
-#   ./start.sh --no-vpn     never use host networking
+#   ./cobalt-start.sh              app only
+#   ./cobalt-start.sh --llm        app + the local model (host ollama by default)
+#   ./cobalt-start.sh --gpu --llm  ollama on an NVIDIA GPU
+#   ./cobalt-start.sh --container-ollama  run ollama in Docker instead of on the host
+#   ./cobalt-start.sh --vpn        force host networking (auto-detected normally)
+#   ./cobalt-start.sh --no-vpn     never use host networking
 #
-# Stop everything with ./stop.sh
+# Stop everything with ./cobalt-stop.sh
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -94,7 +94,7 @@ if [ "$LLM" = 1 ] && [ "$CONTAINER_OLLAMA" = 0 ]; then
     export OLLAMA_MODEL=cobalt
   else
     echo "could not reach or start ollama on the host." >&2
-    echo "either start it, or run the containerised one:  ./start.sh --container-ollama" >&2
+    echo "either start it, or run the containerised one:  ./cobalt-start.sh --container-ollama" >&2
     exit 1
   fi
 fi
@@ -150,6 +150,6 @@ echo "  container is healthy, but ${URL} is not reachable."
 if [ "$VPN" = on ]; then
   echo "  host networking is already on. Check:  docker compose ${FILES[*]} logs web"
 else
-  echo "  If a VPN is connected, retry with:  ./start.sh --vpn"
+  echo "  If a VPN is connected, retry with:  ./cobalt-start.sh --vpn"
 fi
 exit 1

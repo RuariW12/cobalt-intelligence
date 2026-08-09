@@ -6,7 +6,7 @@
 #   runtime - connections to published ports die even though docker-proxy
 #             is listening
 #
-# ./start.sh applies this automatically when it detects the condition.
+# ./cobalt-start.sh applies this automatically when it detects the condition.
 #
 # Linux only. The cleaner fix is to allow local network sharing in the VPN
 # client, which keeps the portable bridge setup working for everyone else:
