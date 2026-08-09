@@ -1,221 +1,354 @@
 # Cobalt
 
-A personal, locally hosted market intelligence platform. Tracks macroeconomics,
-interest rates, market indexes, commodities, key companies and ETFs, pulls news
-alongside them, and summarises any section with a local LLM.
+A market intelligence platform that runs entirely on your own hardware.
 
-Everything runs on your own machine. No accounts, no cloud, no telemetry.
+Cobalt tracks macroeconomics, interest rates, market indexes, commodities, key
+companies and ETFs, pulls the news around them, and uses a local language model
+to explain what changed. No accounts, no subscription, and nothing is sent
+anywhere.
+
+## Why
+
+Most of this information is already free. The Federal Reserve publishes its own
+data, Yahoo carries prices, and every news outlet has an RSS feed. What is
+normally sold is the convenience of having it in one place, and the price of
+that convenience is a monthly fee, an account, and your reading habits as a
+data product.
+
+Cobalt is the same information assembled locally. A few rules shaped every
+decision in it:
+
+**Only free, public sources.** If something cannot be fetched without a paid
+subscription, it does not go in.
+
+**Gaps are shown as gaps.** Tungsten, uranium, lithium and cobalt have no free
+spot price. Rather than approximate them, those rows are left out and the metals
+are followed through mining ETFs, which the page says plainly. A blank you
+understand is worth more than a number you cannot trust.
+
+**Data is dated, and never overwritten.** Economic series get revised. Every
+observation is stored against the day it belongs to, so a revision stays
+visible instead of quietly replacing history. Prices older than their cadence
+allows are marked stale rather than passing for current.
+
+**Headlines link out.** Only a headline, a link and a timestamp are stored,
+never article text. Every story goes back to whoever wrote it.
+
+**The model only sees what you see.** Summaries are built from the figures and
+headlines already on the page, with instructions not to introduce anything
+else. It runs on your GPU, so no prompt leaves the machine.
+
+**Relationships over portfolio tracking.** The interesting part is not what you
+own. It is that inflation moves rates, rates move housing, and AI capex moves
+electricity demand and then commodities. Instruments are tagged by economic
+meaning, so a story about NVIDIA reaches the semiconductor page and the AI
+tracker without being filed twice.
 
 ---
 
-## Quick start
+## Contents
 
-Requires [Docker](https://docs.docker.com/get-docker/) with Compose v2.
+- [Screenshots](#screenshots)
+- [What it tracks](#what-it-tracks)
+- [Running it](#running-it)
+  - [Behind a VPN](#behind-a-vpn)
+- [Adding summaries](#adding-summaries)
+  - [Using an NVIDIA GPU](#using-an-nvidia-gpu)
+  - [Configuring the model](#configuring-the-model)
+- [How it works](#how-it-works)
+  - [The catalog](#the-catalog)
+  - [Ingest](#ingest)
+  - [Cleaning](#cleaning)
+  - [The document layer](#the-document-layer)
+  - [Rendering](#rendering)
+- [Data sources](#data-sources)
+- [Project layout](#project-layout)
+- [Development](#development)
+- [Troubleshooting](#troubleshooting)
+- [Licence](#licence)
+
+---
+
+## Screenshots
+
+> Placeholders for now. Drop images into `docs/screenshots/` to fill them in.
+
+**Home**
+
+![Home page](docs/screenshots/home.png)
+
+**A section page: prices, chart, and headlines matched to what it tracks**
+
+![Commodities](docs/screenshots/commodities.png)
+
+**A generated summary**
+
+![Summary](docs/screenshots/summary.png)
+
+**Day mode**
+
+![Day mode](docs/screenshots/day-mode.png)
+
+---
+
+## What it tracks
+
+| Section | Contents |
+| --- | --- |
+| News | Politics, economics, technology and science |
+| Macroeconomics | Inflation, labour, growth |
+| Interest rates & credit | Policy rate, 2/10/30-year treasuries, the curve, credit spreads |
+| Market indexes | US and international |
+| Commodities | Precious, industrial and energy |
+| Key companies | Tech/AI, industrial, energy, financials, consumer |
+| ETFs | Broad market, international, materials |
+| AI bubble tracker | Concentration, the AI supply chain, capex, buildout and power |
+| Bitcoin | Price, and Strategy's common and preferred |
+
+Every price page has a chart with 1D, 1W, 1M, YTD, 1Y, 5Y and 10Y ranges, and a
+block of headlines matched to what that page tracks.
+
+---
+
+## Running it
+
+You need [Docker](https://docs.docker.com/get-docker/). Everything else —
+Python, the database, the web server — is inside the image.
 
 ```sh
 git clone https://github.com/RuariW12/cobalt-intelligence
 cd cobalt-intelligence
-cp .env.example .env      # optional for now; needed once the ETL lands
 ./cobalt-start.sh
 ```
 
-Open <http://localhost:5173>. Stop with `./cobalt-stop.sh` — your data is in a named
-volume and survives.
+Open <http://localhost:5173> and press the refresh icon next to the title. The
+first ingest takes about thirty seconds.
 
 ```sh
-./cobalt-start.sh              app only
-./cobalt-start.sh --llm        + the local model server
-./cobalt-start.sh --gpu --llm  + the model server on an NVIDIA GPU
-./cobalt-stop.sh               stop everything, keep data
-./cobalt-stop.sh --wipe        also delete the database and model weights
+./cobalt-start.sh              # app only
+./cobalt-start.sh --llm        # + the local model
+./cobalt-start.sh --gpu --llm  # + the model in a container on an NVIDIA GPU
+./cobalt-stop.sh               # stop; your data is kept
+./cobalt-stop.sh --wipe        # stop and delete the database and model weights
 ```
 
-If port 5173 is taken, set `COBALT_PORT` in `.env`.
+**Economic data needs a free key.** Register at
+[fredaccount.stlouisfed.org](https://fredaccount.stlouisfed.org), then:
+
+```sh
+cp .env.example .env
+# paste the key after FRED_API_KEY=
+```
+
+Without it, prices, ETFs and news still work; the macro and interest-rate pages
+stay blank.
+
+Other settings in `.env`: `COBALT_PORT` if 5173 is taken, and `TZ` so "today"
+means your day rather than UTC.
+
+**On Windows**, install Docker Desktop, let it enable WSL2, and run the commands
+from a WSL terminal rather than PowerShell.
 
 ### Behind a VPN
 
-A kill switch that drops non-tunnel traffic (Mullvad, ProtonVPN and similar)
-breaks Docker's bridge network — builds fail to reach PyPI and published ports
-refuse connections even though the container is healthy. `./cobalt-start.sh` detects
-this and switches to host networking automatically.
+A kill switch that drops non-tunnel traffic breaks Docker's bridge network in
+two places at once: the build cannot reach PyPI, and connections to the app die
+even though the container reports healthy. `./cobalt-start.sh` detects this and
+switches to host networking on its own.
 
-The cleaner fix, which keeps the portable setup everyone else uses:
-
-```sh
-mullvad lan set allow
-```
+The cleaner fix is to allow local network sharing in your VPN client. On Mullvad
+that is `mullvad lan set allow`.
 
 ---
 
-## Running the local LLM
+## Adding summaries
+
+The model runs on the host rather than in a container, because that is the
+better trade with an NVIDIA card: Ollama talks to the driver directly, so no
+container toolkit is needed, and the weights are not downloaded twice.
 
 ```sh
+curl -fsSL https://ollama.com/install.sh | sh   # or download for macOS/Windows
+ollama pull qwen3.5:9b
 ./cobalt-start.sh --llm
 ```
 
-That checks Ollama is up (starting the service if not), builds the **cobalt**
-model from `config/ollama/Modelfile`, points the app at it, and prints whether
-it landed on the GPU:
+The script builds a model named `cobalt` from `config/ollama/Modelfile` and
+prints where it landed:
 
 ```
-  cobalt is up -> http://localhost:5173
-  model        -> cobalt on http://127.0.0.1:11434
-  processor    -> 100% GPU
+cobalt is up -> http://localhost:5173
+model        -> cobalt on http://127.0.0.1:11434
+processor    -> 100% GPU
 ```
 
-If that last line says CPU, the model is running perhaps 20x slower than it
-should — see below.
+If that last line does not say GPU, the model is on the CPU and summaries take a
+minute instead of a few seconds.
 
-### Ollama runs on the host, not in a container
+Sizing for a 12 GB card: an 8–9B model at Q4 is about 5 GB and fits with room
+for a 16k context. A 14B is about 9 GB and fits with
+`OLLAMA_KV_CACHE_TYPE=q8_0`. Anything at 24B or above spills into system RAM and
+crawls. Summarising is prefill-heavy — long input, short output — and CPU
+offload hurts prefill far more than generation, so staying inside VRAM matters
+more than parameter count.
 
-That is the default because it is the better trade with an NVIDIA card:
+### Using an NVIDIA GPU
 
-- **No NVIDIA Container Toolkit needed.** Ollama talks to the driver directly.
-  Inside Docker it needs the toolkit, and without it falls back to CPU silently.
-- **No duplicate weights.** The model you already pulled is used as is, rather
-  than downloaded again into a volume.
-
-Install Ollama from <https://ollama.com>, then pull the base model:
+Only needed if you run Ollama **inside** a container with `--container-ollama`.
+With the default host-native Ollama the GPU already works.
 
 ```sh
-ollama pull qwen3.5:9b          # or set OLLAMA_BASE_MODEL
-```
-
-To run it in Docker anyway: `./cobalt-start.sh --container-ollama` — and read the GPU
-section below first, or it will be CPU-only.
-
-### Configuration
-
-`config/ollama/Modelfile` defines the **cobalt** model: context window, sampling
-parameters and system prompt, version-controlled in the repo. `./cobalt-start.sh --llm`
-rebuilds it every run, which is cheap — it is a manifest over weights already on
-disk, not another copy.
-
-Two settings matter more than the rest:
-
-- **`num_ctx 16384`.** Ollama defaults to 4096 and truncates past it *silently*.
-  A day of headlines exceeds that, and the result looks like a working summary
-  of partial data rather than an error.
-- **`"think": false` on every request.** qwen3.5 is a reasoning model. Measured
-  on an RTX 4070 Super with the same prompt:
-
-  | | wall | tokens generated |
-  | --- | --- | --- |
-  | `think: true` | 52.7s | 3220 |
-  | `think: false` | **2.4s** | 124 |
-
-  The shorter run produced the better summary. This one cannot live in the
-  Modelfile — `PARAMETER think` is rejected — so it belongs in the request body.
-
-## Using an NVIDIA GPU
-
-**Only needed if you run Ollama in a container** (`--container-ollama`). With
-the default host-native Ollama the GPU already works, and `./cobalt-start.sh --llm`
-prints `processor -> 100% GPU` to prove it.
-
-Docker cannot see your GPU by default. Without the steps below the container
-starts and **silently runs on CPU**.
-
-### 1. Install the NVIDIA Container Toolkit
-
-Driver first — check with `nvidia-smi`. Then, on Debian/Ubuntu:
-
-```sh
-curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
-  | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
-curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
-  | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
-  | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-
-sudo apt update && sudo apt install -y nvidia-container-toolkit
+sudo apt install -y nvidia-container-toolkit
 sudo nvidia-ctk runtime configure --runtime=docker
 sudo systemctl restart docker
-```
-
-Fedora/RHEL use `dnf` with the equivalent repo; Arch has
-`nvidia-container-toolkit` in the AUR.
-
-### 2. Verify Docker can see the GPU
-
-```sh
 docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
 ```
 
-Your GPU should be listed. If this fails, nothing below will work.
+Docker Desktop cannot pass through Apple Silicon GPUs, so on a Mac Ollama has to
+run natively — which is the default here anyway.
 
-### 3. Start with the GPU overlay
+### Configuring the model
 
-```sh
-./cobalt-start.sh --gpu --llm
+`config/ollama/Modelfile` holds the context window, sampling parameters and
+system prompt, version-controlled in the repo. Two settings matter more than the
+rest:
+
+- **`num_ctx 16384`.** Ollama defaults to 4096 and truncates past it silently. A
+  day of headlines exceeds that, and the result looks like a working summary of
+  partial data rather than an error.
+- **`"think": false`** on every request. Qwen is a reasoning model and left alone
+  spends thousands of tokens thinking before answering. Measured on the same
+  prompt: 52.7s and 3220 tokens with thinking, 2.4s and 124 tokens without — and
+  the shorter run gave the better summary. This one cannot go in the Modelfile,
+  so it is set in the request body.
+
+---
+
+## How it works
+
+```
+app/catalog.py ──┬─► instruments + tags ──────► instrument, tag
+                 │
+                 └─► what each section needs ─► symbols[] , series[]
+                                                   │        │
+                                         Yahoo chart      FRED      RSS feeds
+                                                   │        │          │
+                                                   └────────┼──────────┘
+                                                            ▼
+                                                     store/clean.py
+                                       validate · derive change · flag suspect
+                                                            ▼
+                                       ┌────────────────────┼───────────────┐
+                                  observation            history         article
+                                 (append-only)       (daily closes)    (url unique)
+                                                            ▼
+                                                    store/documents.py
+                                            one dated, tagged sentence per fact
+                                                            ▼
+                                                        document
+                                                       │        │
+                                          pages ◄──────┘        └──────► the model
 ```
 
-### 4. Confirm the model is actually on the GPU
+### The catalog
 
-```sh
-docker compose -f docker/compose.yml exec ollama ollama ps
+`app/catalog.py` is the single source of truth. It describes every page as an
+ordered list of panels, and every data row carries the identifier that fills it:
+`series` for FRED, `symbol` for Yahoo, `derived` for something computed here.
+
+The templates walk it to lay out a page. The ETL walks the same file to learn
+what to fetch. They cannot disagree, because a page and its ingest are one
+declaration. Adding a row is all it takes to start tracking something.
+
+A guard runs at import: a row that prints a ticker must fetch that same ticker.
+It caught a real bug where the VOO row fetched `^GSPC`, so the ETF page showed
+the S&P 500 index level in place of the fund price — plausible-looking, wrong,
+and silent.
+
+### Ingest
+
+`etl/run.py` reads the catalog for a section, fetches what it needs, and never
+lets one failure take down the run. Prices come from Yahoo's chart endpoint,
+which serves quotes with no key, cookie or crumb — which is why this needs
+neither `yfinance` nor pandas. That same response carries a year of daily
+closes, so the charts cost no extra requests.
+
+### Cleaning
+
+Every source funnels through `store/clean.py`, so they all get the same
+guarantees: floats coerced, NaN rejected, `change` derived from the prices
+rather than trusted, percent change only for price-like assets, and implausible
+moves flagged rather than dropped. A suspicious number you can see beats a gap
+you cannot explain.
+
+### The document layer
+
+A table row is a poor unit of retrieval — it means nothing without its header,
+its units and its date. So every observation also becomes one self-contained
+sentence:
+
+```
+2026-08-07 — Gold (GC=F), commodities/precious: 4,399.70 USD / troy oz,
++157.70 (+3.72%) versus the previous session; +1.98% year to date.
+tags: commodities future inflation-hedge precious precious-metals safe-haven
 ```
 
-The `PROCESSOR` column should read `100% GPU`. Anything mentioning CPU means
-the toolkit isn't wired up — recheck step 2.
+Headlines become documents the same way. That is what the model reads, and what
+an embedding index would index later. Tags are structural (section, category),
+inferred (asset class) and thematic (`ai-supply-chain`, `recession-signal`), so
+retrieval can cross sections.
 
-### No GPU, or on a Mac?
+### Rendering
 
-It still runs; generation is just slower. Docker Desktop **cannot** pass through
-Apple Silicon GPUs, so on a Mac run Ollama natively instead and point the app at
-it — skip the `llm` profile and set in `.env`:
+`app/render.py` fills catalog rows from the store. A row with no observation
+keeps its placeholder styling, so an un-ingested page looks deliberately empty
+rather than broken. Summaries retrieve documents by section and tag, label them
+as figures and headlines, and hand both to the model.
 
-```sh
-OLLAMA_URL=http://host.docker.internal:11434     # macOS / Windows
-OLLAMA_URL=http://172.17.0.1:11434               # Linux, host-native ollama
+---
+
+## Data sources
+
+| Source | Provides | Key |
+| --- | --- | --- |
+| [FRED](https://fred.stlouisfed.org) | Inflation, labour, growth, treasuries, credit spreads | Free, required for these |
+| [Yahoo Finance](https://finance.yahoo.com) | Equities, ETFs, indexes, futures, crypto, history | None |
+| RSS | 13 publishers across politics, economics, tech and crypto | None |
+
+FRED series are requested with the transform the page actually means. Asking for
+CPI as a level and labelling it "year over year" would be wrong in the way that
+is hardest to notice, so inflation series are fetched as `pc1`, monthly changes
+as `pch`, and GDP as `pca`.
+
+Some things are tracked but cannot be priced for free, and are left blank rather
+than guessed: tungsten, uranium, lithium, cobalt, iron ore and nickel. ISM PMI
+was removed from FRED in 2016 over licensing. Forward P/E and index constituent
+weights are paywalled.
+
+---
+
+## Project layout
+
+```
+cobalt-start.sh  cobalt-stop.sh    the supported way to run it
+app/catalog.py                     every page, panel and row
+app/main.py                        FastAPI: pages, /api/refresh, /api/summarize
+app/render.py                      fills catalog rows from the store
+app/templates/                     base.html + page.html render all 30 pages
+store/                             schema, cleaning, tagging, documents
+etl/                               ingest and the source adapters
+web/                               stylesheets and scripts
+config/ollama/Modelfile            the model's context, sampling and prompt
+docker/                            Dockerfile and compose files
+context/                           design notes and the reasoning behind them
 ```
 
 ---
 
-## Ingesting data
+## Development
 
-```sh
-docker compose -f docker/compose.yml run --rm etl --section macro
-docker compose -f docker/compose.yml run --rm etl --section all
-```
-
-Most series come from [FRED](https://fredaccount.stlouisfed.org), which needs a
-free API key in `.env` as `FRED_API_KEY`. Prices come from Yahoo Finance and
-need no key.
-
-Not implemented yet — the command currently exits with a pointer to the design
-in [`context/etl-plan.md`](context/etl-plan.md).
-
----
-
-## How it fits together
-
-| Service | Role |
-| --- | --- |
-| `web` | FastAPI. Serves the pages and the API on port 8000 in-container. |
-| `etl` | Same image, one-shot ingest command. |
-| `ollama` | Model server — only for `--container-ollama`. By default Ollama runs on the host. |
-| `model-init` | Pulls the base weights into the container volume, then exits. Same caveat. |
-
-**There is no database service.** SQLite is a file, not a server; it lives in
-the `cobalt-data` volume that `web` and `etl` share. If this ever needs
-concurrent writers or network access, that is when Postgres becomes a container.
-
-```
-cobalt-start.sh cobalt-stop.sh   the supported way to run it
-config/ollama/     Modelfile defining the "cobalt" model
-app/               FastAPI service
-etl/               ingest pipeline (stub)
-web/               the served root — nothing outside this directory is public
-docker/            Dockerfile, compose.yml, and the gpu / vpn overlays
-context/           design notes: the spec, sources, decisions and their reasoning
-.dockerignore      stays at the root: it must sit at the build context root
-```
-
-### Editing the Python
-
-The app only ever runs in Docker, so nothing needs installing to use it. But an
-editor cannot resolve `fastapi` without a local interpreter that has it, which
-shows up as a false "import could not be resolved" warning.
+The app runs in Docker, so nothing needs installing to use it. To stop your
+editor complaining about unresolved imports:
 
 ```sh
 python3 -m venv .venv
@@ -223,22 +356,23 @@ python3 -m venv .venv
 ```
 
 Installing from the lock rather than `requirements.txt` means the editor checks
-against exactly the versions the container runs. `.vscode/settings.json` already
-points at `.venv`; other editors need the interpreter set once.
+against exactly the versions the container runs.
+
+`web/` and `app/templates/` are bind-mounted, so stylesheets, scripts and
+templates are live. Python code is baked into the image and needs a restart.
+
+Assets are served with a version query string derived from their modification
+time, so a CSS edit can never be masked by a cached copy.
 
 ### Reproducibility
 
-- `requirements.lock` pins every package, including transitive dependencies.
-  Rebuilding on another machine or in a year resolves identically.
-  Regenerate after editing `requirements.txt`:
-  ```sh
-  docker compose -f docker/compose.yml build web
-  docker run --rm cobalt:latest pip freeze > requirements.lock
-  ```
-- The base image `python:3.12-slim` and `ollama/ollama` are both multi-arch, so
-  amd64 and arm64 hosts build from the same file.
-- Set `TZ` in `.env` (e.g. `TZ=America/New_York`). Containers default to UTC,
-  which shifts what counts as "today" for news and market sessions.
+`requirements.lock` pins every package including transitive dependencies.
+Regenerate after editing `requirements.txt`:
+
+```sh
+docker compose -f docker/compose.yml build web
+docker run --rm cobalt:latest pip freeze > requirements.lock
+```
 
 ### Backup
 
@@ -251,13 +385,36 @@ docker run --rm -v cobalt_cobalt-data:/d -v "$PWD":/b alpine \
 
 ## Troubleshooting
 
-**`pip` fails during build with a DNS error.** Usually a VPN kill switch (see
-*Behind a VPN* above) — `./cobalt-start.sh` handles it. Otherwise your daemon has no
-working DNS: add `{"dns": ["1.1.1.1"]}` to `/etc/docker/daemon.json` and
-restart Docker.
+**Port 5173 already in use.** Set `COBALT_PORT` in `.env`. The start script names
+whatever is holding the port.
 
-**Port already in use.** Set `COBALT_PORT` in `.env`, or find the holder with
-`ss -ltnp | grep 5173`. `./cobalt-start.sh` names the holder for you.
+**Permission denied connecting to the Docker daemon** (Linux). Run
+`sudo usermod -aG docker $USER`, then log out and back in.
 
-**Pages 404 but `/api/health` works.** The `web/` directory didn't make it into
-the image. Rebuild with `docker compose build --no-cache web`.
+**The build fails with a DNS error.** Usually a VPN kill switch — see
+[Behind a VPN](#behind-a-vpn). Otherwise your daemon has no working DNS: add
+`{"dns": ["1.1.1.1"]}` to `/etc/docker/daemon.json` and restart Docker.
+
+**The container is healthy but the page will not load.** Same VPN cause. Run
+`./cobalt-start.sh --vpn`.
+
+**Macro and interest-rate pages are empty.** No `FRED_API_KEY`, or it was added
+after the container started. Restart.
+
+**Summarize says the model is unavailable.** Ollama is not running. Start it,
+then use `./cobalt-start.sh --llm`.
+
+**Summaries take a minute.** The model is on the CPU. Run `ollama ps` — the
+processor column should read 100% GPU.
+
+**Prices look out of date.** Markets were closed at the last refresh. Hover any
+row for the date the figure belongs to; stale rows are greyed with a red tick.
+
+---
+
+## Licence
+
+[MIT](LICENSE). Use it, change it, run your own.
+
+Not investment advice. The data comes from third parties and can be wrong, late
+or revised.
